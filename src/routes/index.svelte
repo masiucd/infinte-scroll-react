@@ -2,11 +2,26 @@
 </script>
 
 <script lang="ts">
+	import TaskList from "$lib/components/TaskList.svelte"
 	import Page from "$lib/Page.svelte"
-	import {staticTasks as tasks} from "$lib/util/task"
+	import {staticTasks as tasks, TaskStatus} from "$lib/util/task"
 
-	const completedTasks = tasks.filter(({done}) => done)
-	const uncompletedTasks = tasks.filter(({done}) => !done)
+	let uncompletedTasks = tasks.filter(({done}) => !done)
+	let completedTasks = tasks.filter(({done}) => done)
+
+	const addTodo = () => {
+		console.log("Click")
+		uncompletedTasks = [
+			...uncompletedTasks,
+			{
+				id: 9,
+				title: "Task 9",
+				done: false,
+				priority: TaskStatus.Low,
+			},
+		]
+	}
+	console.log(uncompletedTasks)
 </script>
 
 <svelte:head>
@@ -15,20 +30,19 @@
 </svelte:head>
 
 <Page>
-	<div class="tasks bg-wave min-h-[30rem] text-white">
+	<div
+		class="tasks bg-shapes h-[43.75rem] min-h-[30rem] bg-stone-200 bg-opacity-90 "
+	>
 		<div class="add_task">
 			<div class="form_group">
 				<input type="text" id="add_task" placeholder="Add a task" value="" />
 			</div>
+			<button on:click={addTodo}>Confirm</button>
 		</div>
-		<div class="grid grid-cols-2 ">
-			<ul>
-				{#each uncompletedTasks as { title }}
-					<li>
-						{title}
-					</li>
-				{/each}
-			</ul>
+		<div class="grid grid-cols-2 h-full items-center gap-4">
+			<TaskList tasks={uncompletedTasks} />
+
+			<TaskList tasks={completedTasks} />
 		</div>
 	</div>
 </Page>

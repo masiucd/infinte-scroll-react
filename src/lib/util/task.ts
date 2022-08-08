@@ -23,6 +23,6 @@ const staticTasks: Task[] = [
 	{id: 4, title: "Eat breakfast", done: true, priority: TaskStatus.Low},
 ]
 
-export type {TaskStatus}
+export type {Task}
 
-export {staticTasks}
+export {staticTasks, TaskStatus}

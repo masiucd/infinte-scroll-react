@@ -2,7 +2,7 @@
 	import "../app.css"
 </script>
 
-<header class="min-h-[4rem] border border-slate-600 shadow ">
+<header class="  ">
 	<h3>Task book</h3>
 </header>
 
@@ -10,4 +10,4 @@
 	<slot />
 </main>
 
-<footer class="min-h-[4rem] border border-slate-600 shadow " />
+<footer class="  " />

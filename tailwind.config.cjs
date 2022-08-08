@@ -5,6 +5,7 @@ module.exports = {
 		extend: {
 			backgroundImage: {
 				wave: "url('/wave.svg')",
+				shapes: "url('/shapes.svg')",
 			},
 		},
 	},
