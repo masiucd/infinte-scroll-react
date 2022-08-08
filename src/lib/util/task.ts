@@ -1,3 +1,5 @@
+import {genRandomString} from "./helpers"
+
 enum TaskStatus {
 	High = "HIGH",
 	Medium = "MEDIUM",
@@ -5,7 +7,7 @@ enum TaskStatus {
 }
 
 interface Task {
-	id: number
+	id: string
 	title: string
 	done: boolean
 	priority: TaskStatus
@@ -13,14 +15,29 @@ interface Task {
 
 const staticTasks: Task[] = [
 	{
-		id: 1,
+		id: genRandomString(),
 		title: "Go to the train station",
 		done: false,
 		priority: TaskStatus.High,
 	},
-	{id: 2, title: "Eat some lunch", done: false, priority: TaskStatus.Medium},
-	{id: 3, title: "Clean the room", done: false, priority: TaskStatus.Low},
-	{id: 4, title: "Eat breakfast", done: true, priority: TaskStatus.Low},
+	{
+		id: genRandomString(),
+		title: "Eat some lunch",
+		done: false,
+		priority: TaskStatus.Medium,
+	},
+	{
+		id: genRandomString(),
+		title: "Clean the room",
+		done: false,
+		priority: TaskStatus.Low,
+	},
+	{
+		id: genRandomString(),
+		title: "Eat breakfast",
+		done: true,
+		priority: TaskStatus.Low,
+	},
 ]
 
 export type {Task}

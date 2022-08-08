@@ -2,46 +2,41 @@
 </script>
 
 <script lang="ts">
+	import AddTaskForm from "$lib/components/AddTaskForm.svelte"
 	import TaskList from "$lib/components/TaskList.svelte"
 	import Page from "$lib/Page.svelte"
+	import {genRandomString} from "$lib/util/helpers"
 	import {staticTasks as tasks, TaskStatus} from "$lib/util/task"
 
 	let uncompletedTasks = tasks.filter(({done}) => !done)
 	let completedTasks = tasks.filter(({done}) => done)
+	let title: string
+	let priority: TaskStatus
 
-	const addTodo = () => {
-		console.log("Click")
+	const addTodo = (title: string, priority: TaskStatus) => {
 		uncompletedTasks = [
 			...uncompletedTasks,
 			{
-				id: 9,
-				title: "Task 9",
+				id: genRandomString(),
+				title,
 				done: false,
-				priority: TaskStatus.Low,
+				priority,
 			},
 		]
 	}
-	console.log(uncompletedTasks)
+	$: console.log(uncompletedTasks)
 </script>
 
 <svelte:head>
-	<title>Task book</title>
-	<meta name="description" content="Task book built using SvelteKit" />
+	<title>Kitchen sink</title>
+	<meta name="description" content="Kitchen sink built using SvelteKit" />
 </svelte:head>
 
 <Page>
-	<div
-		class="tasks bg-shapes h-[43.75rem] min-h-[30rem] bg-stone-200 bg-opacity-90 "
-	>
-		<div class="add_task">
-			<div class="form_group">
-				<input type="text" id="add_task" placeholder="Add a task" value="" />
-			</div>
-			<button on:click={addTodo}>Confirm</button>
-		</div>
+	<div class="h-[43.75rem] min-h-[30rem] p-1 border border-red-400 p-1">
+		<AddTaskForm {addTodo} />
 		<div class="grid grid-cols-2 h-full items-center gap-4">
 			<TaskList tasks={uncompletedTasks} />
-
 			<TaskList tasks={completedTasks} />
 		</div>
 	</div>
