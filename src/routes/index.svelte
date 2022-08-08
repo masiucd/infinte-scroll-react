@@ -2,8 +2,8 @@
 </script>
 
 <script lang="ts">
-	import AddTaskForm from "$lib/components/AddTaskForm.svelte"
-	import TaskList from "$lib/components/TaskList.svelte"
+	import AddTaskForm from "$lib/components/task_list/AddTaskForm.svelte"
+	import TaskList from "$lib/components/task_list/TaskList.svelte"
 	import Page from "$lib/Page.svelte"
 	import {genRandomString} from "$lib/util/helpers"
 	import {staticTasks as tasks, TaskStatus} from "$lib/util/task"
@@ -24,7 +24,6 @@
 			},
 		]
 	}
-	$: console.log(uncompletedTasks)
 </script>
 
 <svelte:head>
@@ -33,12 +32,17 @@
 </svelte:head>
 
 <Page>
-	<div class="h-[43.75rem] min-h-[30rem] p-1 border border-red-400 p-1">
+	<div class="h-[43.75rem] min-h-[30rem] p-1">
 		<AddTaskForm {addTodo} />
 		<div class="grid grid-cols-2 h-full items-center gap-4">
-			<TaskList tasks={uncompletedTasks} />
-			<TaskList tasks={completedTasks} />
+			<div class=" min-h-[10rem] max-h-[25rem]">
+				<h4 class="mb-1 text-2xl">Uncompled</h4>
+				<TaskList tasks={uncompletedTasks} type="unompleted" />
+			</div>
+			<div class="-500 min-h-[10rem] max-h-[25rem]">
+				<h4 class="mb-1 text-2xl">Completed</h4>
+				<TaskList tasks={completedTasks} type="completed" />
+			</div>
 		</div>
 	</div>
 </Page>
-<!-- <Counter /> -->
