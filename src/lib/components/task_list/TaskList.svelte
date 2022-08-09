@@ -1,11 +1,10 @@
 <script lang="ts">
-	type ListType = "unompleted" | "completed"
-	import type {Task} from "$lib/util/task"
+	import type {ListType, Task} from "$lib/util/task"
 	import {twMerge} from "tailwind-merge"
 	import Checkbox from "../common/Checkbox.svelte"
 	export let tasks: Task[]
-
 	export let type: ListType
+	export let removeTask = (id: string, type: ListType) => Boolean
 </script>
 
 <ul
@@ -14,15 +13,18 @@
 		type === "completed" ? "bg-slate-400" : "bg-blue-400"
 	)}
 >
-	{#if tasks.length === 0 && type === "unompleted"}
+	{#if tasks.length === 0 && type === "uncompleted"}
 		<li>Uncompleted tasks are empty</li>
 	{:else if tasks.length === 0 && type === "completed"}
 		<li>Completed tasks are empty</li>
 	{:else}
-		{#each tasks as { title }}
-			<li class="flex gap-2">
-				<p>{title}</p>
-				<Checkbox label="foo" />
+		{#each tasks as { title, done, id }}
+			<li class="flex gap-2 items-center px-1 py-2">
+				<Checkbox label={title} checked={done} wapperStyles="mb-0" />
+				<button
+					class="bg-transparent  inline-block p-0 m-0 hover:bg-transparent hover:text-red-500"
+					on:click={() => removeTask(id, type)}>X</button
+				>
 			</li>
 		{/each}
 	{/if}

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import {TaskStatus} from "$lib/util/task"
-	import {twMerge} from "tailwind-merge"
 
 	export let addTodo: (title: string, priority: TaskStatus) => void
 	let title: string
@@ -13,7 +12,13 @@
 	}
 </script>
 
-<form class="flex flex-col md:flex-row">
+<form
+	class="flex flex-col md:flex-row"
+	on:submit={(e) => {
+		// TODO remove when working with DB
+		e.preventDefault()
+	}}
+>
 	<div class="flex-1 basis-1 p-1">
 		<label for="add_task"> <span>Add a new task</span> </label>
 		<input

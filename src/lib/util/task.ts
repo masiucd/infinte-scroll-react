@@ -1,5 +1,6 @@
 import {genRandomString} from "./helpers"
 
+type ListType = "uncompleted" | "completed"
 enum TaskStatus {
 	High = "HIGH",
 	Medium = "MEDIUM",
@@ -40,6 +41,6 @@ const staticTasks: Task[] = [
 	},
 ]
 
-export type {Task}
+export type {Task, ListType}
 
 export {staticTasks, TaskStatus}
