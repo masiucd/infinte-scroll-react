@@ -8,6 +8,16 @@
 		id: string,
 		type: ListType
 	) => (done: boolean) => boolean
+
+	const editTodo = (
+		id: string,
+		list: Task[],
+		fields: Pick<Task, "title" | "priority">
+	) => {
+		// TODO check if this will work
+		list = list.map((task) => (task.id === id ? {...task, ...fields} : task))
+		return true
+	}
 </script>
 
 <div class="grid grid-cols-2 h-full items-center gap-4 p-2">
