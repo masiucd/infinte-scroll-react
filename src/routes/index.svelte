@@ -11,6 +11,27 @@
 	let uncompletedTasks = tasks.filter(({done}) => !done)
 	let completedTasks = tasks.filter(({done}) => done)
 
+	const toggleDone = (id: string, type: ListType) => (done: boolean) => {
+		if (type === "uncompleted") {
+			uncompletedTasks = uncompletedTasks.map((task) =>
+				task.id === id ? {...task, done} : task
+			)
+			const completed = uncompletedTasks.find((task) => task.done)
+			if (completed) {
+				completedTasks.push(completed)
+				completedTasks = completedTasks
+				uncompletedTasks = uncompletedTasks.filter(
+					(task) => task.id != completed.id
+				)
+			}
+			return true
+		}
+		completedTasks = completedTasks.map((task) =>
+			task.id === id ? {...task, done} : task
+		)
+		return true
+	}
+
 	const addTodo = (title: string, priority: TaskStatus) => {
 		uncompletedTasks = [
 			...uncompletedTasks,
@@ -22,7 +43,7 @@
 			},
 		]
 	}
-	const removeTask = (id: string, type: ListType): boolean => {
+	const removeTask = (id: string, type: ListType) => {
 		switch (type) {
 			case "completed":
 				completedTasks = completedTasks.filter((task) => task.id !== id)
@@ -34,6 +55,10 @@
 				return false
 		}
 	}
+
+	$: {
+		console.log(uncompletedTasks)
+	}
 </script>
 
 <svelte:head>
@@ -44,6 +69,6 @@
 <Page>
 	<div class="h-[43.75rem] min-h-[30rem] p-1">
 		<AddTaskForm {addTodo} />
-		<ListGrid {uncompletedTasks} {completedTasks} {removeTask} />
+		<ListGrid {uncompletedTasks} {completedTasks} {removeTask} {toggleDone} />
 	</div>
 </Page>
