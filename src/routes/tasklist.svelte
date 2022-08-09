@@ -43,7 +43,7 @@
 		uncompletedTasks = [
 			...uncompletedTasks,
 			{
-				id: genRandomString(),
+				id: (uncompletedTasks.length + completedTasks.length + 1).toString(),
 				title,
 				done: false,
 				priority,
@@ -70,7 +70,7 @@
 </svelte:head>
 
 <Page styles="p-0 flex flex-col justify-center bg-slate-100 ">
-	<div class="min-h-[20rem] rounded shadow">
+	<div class="min-h-[20rem] shadow">
 		<AddTaskForm {addTodo} />
 		<ListGrid {uncompletedTasks} {completedTasks} {removeTask} {toggleDone} />
 	</div>

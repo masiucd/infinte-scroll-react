@@ -20,9 +20,9 @@
 	}
 </script>
 
-<div class="grid grid-cols-2 h-full items-center gap-4 p-2">
-	<div class=" min-h-[10rem] max-h-[25rem]">
-		<h4 class="mb-1 text-2xl">Uncompled</h4>
+<div class="grid grid-cols-2 items-center gap-4 p-2">
+	<div class="h-full">
+		<h4 class="text-2xl">Uncompled</h4>
 		<TaskList
 			tasks={uncompletedTasks}
 			type="uncompleted"
@@ -30,8 +30,8 @@
 			{toggleDone}
 		/>
 	</div>
-	<div class="-500 min-h-[10rem] max-h-[25rem]">
-		<h4 class="mb-1 text-2xl">Completed</h4>
+	<div class="h-full">
+		<h4 class="text-2xl">Completed</h4>
 		<TaskList
 			tasks={completedTasks}
 			type="completed"

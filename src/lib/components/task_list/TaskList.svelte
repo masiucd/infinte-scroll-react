@@ -9,6 +9,11 @@
 		id: string,
 		type: ListType
 	) => (done: boolean) => boolean
+
+	let isEditOpen = false
+	const toggleEdit = () => {
+		isEditOpen = !isEditOpen
+	}
 	const onChange = (id: string, type: ListType) => toggleDone(id, type)
 </script>
 
@@ -24,25 +29,35 @@
 		<li class="px-1 py-2">Completed tasks are empty</li>
 	{:else}
 		{#each tasks as { title, done, id }}
-			<li class="flex gap-2 items-center px-1 py-2 justify-between">
-				<Checkbox
-					label={title}
-					checked={done}
-					wapperStyles="mb-0"
-					onChange={onChange(id, type)}
-				/>
-				<div class="mr-3">
-					<button
-						class="bg-transparent inline-block p-0 m-0 hover:bg-transparent hover:text-orange-500 text-slate-900"
-						>Edit</button
-					>
-					<button
-						class="bg-transparent  inline-block p-0 m-0 hover:bg-transparent hover:text-red-500 text-slate-900"
-						on:click={() => {
-							removeTask(id, type)
-						}}>X</button
-					>
+			<li>
+				<div class="flex gap-2 items-center px-1 py-2 justify-between">
+					<Checkbox
+						label={title}
+						checked={done}
+						wapperStyles="mb-0"
+						onChange={onChange(id, type)}
+					/>
+					<div class="mr-3">
+						<button
+							class="bg-transparent inline-block p-0 m-0 hover:bg-transparent hover:text-orange-500 text-slate-900"
+							on:click={toggleEdit}>Edit</button
+						>
+						<button
+							class="bg-transparent  inline-block p-0 m-0 hover:bg-transparent hover:text-red-500 text-slate-900"
+							on:click={() => {
+								removeTask(id, type)
+							}}>X</button
+						>
+					</div>
 				</div>
+				{#if isEditOpen}
+					<input
+						type="text"
+						id="add_task"
+						placeholder={`Edit ${title.slice(0.15)}...`}
+						class="w-full  outline-none shadow h-10"
+					/>
+				{/if}
 			</li>
 		{/each}
 	{/if}
