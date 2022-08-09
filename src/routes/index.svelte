@@ -16,19 +16,21 @@
 			uncompletedTasks = uncompletedTasks.map((task) =>
 				task.id === id ? {...task, done} : task
 			)
-			const completed = uncompletedTasks.find((task) => task.done)
+			const completed = uncompletedTasks.find(({done}) => done)
 			if (completed) {
-				completedTasks.push(completed)
-				completedTasks = completedTasks
-				uncompletedTasks = uncompletedTasks.filter(
-					(task) => task.id != completed.id
-				)
+				uncompletedTasks = uncompletedTasks.filter(({id}) => id != completed.id)
+				completedTasks = [...completedTasks, completed]
 			}
 			return true
 		}
 		completedTasks = completedTasks.map((task) =>
 			task.id === id ? {...task, done} : task
 		)
+		const unCompleted = completedTasks.find(({done}) => !done)
+		if (unCompleted) {
+			completedTasks = completedTasks.filter(({id}) => id !== unCompleted.id)
+			uncompletedTasks = [...uncompletedTasks, unCompleted]
+		}
 		return true
 	}
 
@@ -57,7 +59,7 @@
 	}
 
 	$: {
-		console.log(uncompletedTasks)
+		console.log({uncompletedTasks, completedTasks})
 	}
 </script>
 
