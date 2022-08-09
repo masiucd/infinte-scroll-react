@@ -10,7 +10,7 @@
 	) => (done: boolean) => boolean
 </script>
 
-<div class="grid grid-cols-2 h-full items-center gap-4">
+<div class="grid grid-cols-2 h-full items-center gap-4 p-2">
 	<div class=" min-h-[10rem] max-h-[25rem]">
 		<h4 class="mb-1 text-2xl">Uncompled</h4>
 		<TaskList

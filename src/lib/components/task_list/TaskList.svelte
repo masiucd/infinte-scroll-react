@@ -14,14 +14,14 @@
 
 <ul
 	class={twMerge(
-		"min-h-[5rem] p-1 rounded-sm shadow",
+		" p-1 rounded-sm shadow",
 		type === "completed" ? "bg-slate-400" : "bg-blue-400"
 	)}
 >
 	{#if tasks.length === 0 && type === "uncompleted"}
-		<li>Uncompleted tasks are empty</li>
+		<li class="px-1 py-2">Uncompleted tasks are empty</li>
 	{:else if tasks.length === 0 && type === "completed"}
-		<li>Completed tasks are empty</li>
+		<li class="px-1 py-2">Completed tasks are empty</li>
 	{:else}
 		{#each tasks as { title, done, id }}
 			<li class="flex gap-2 items-center px-1 py-2">

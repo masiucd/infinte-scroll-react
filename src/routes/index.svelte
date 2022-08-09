@@ -19,6 +19,7 @@
 			const completed = uncompletedTasks.find(({done}) => done)
 			if (completed) {
 				uncompletedTasks = uncompletedTasks.filter(({id}) => id != completed.id)
+				console.log("completed", completed)
 				completedTasks = [...completedTasks, completed]
 			}
 			return true
@@ -68,8 +69,8 @@
 	<meta name="description" content="Kitchen sink built using SvelteKit" />
 </svelte:head>
 
-<Page>
-	<div class="h-[43.75rem] min-h-[30rem] p-1">
+<Page styles="p-0 flex flex-col justify-center bg-slate-100 ">
+	<div class="min-h-[20rem] rounded shadow">
 		<AddTaskForm {addTodo} />
 		<ListGrid {uncompletedTasks} {completedTasks} {removeTask} {toggleDone} />
 	</div>

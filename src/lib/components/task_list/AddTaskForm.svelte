@@ -13,7 +13,7 @@
 </script>
 
 <form
-	class="flex flex-col md:flex-row"
+	class="flex flex-col md:flex-row mb-2"
 	on:submit={(e) => {
 		// TODO remove when working with DB
 		e.preventDefault()
