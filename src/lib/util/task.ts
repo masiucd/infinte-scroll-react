@@ -41,6 +41,12 @@ const staticTasks: Task[] = [
 	},
 ]
 
+const staticTaskStatus: TaskStatus[] = [
+	TaskStatus.Low,
+	TaskStatus.Medium,
+	TaskStatus.High,
+]
+
 export type {Task, ListType}
 
-export {staticTasks, TaskStatus}
+export {staticTasks, TaskStatus, staticTaskStatus}

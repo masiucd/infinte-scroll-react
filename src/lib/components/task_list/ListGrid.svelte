@@ -8,16 +8,11 @@
 		id: string,
 		type: ListType
 	) => (done: boolean) => boolean
-
-	const editTodo = (
+	export let editTodo: (
 		id: string,
-		list: Task[],
-		fields: Pick<Task, "title" | "priority">
-	) => {
-		// TODO check if this will work
-		list = list.map((task) => (task.id === id ? {...task, ...fields} : task))
-		return true
-	}
+		fields: Pick<Task, "title" | "priority">,
+		type: ListType
+	) => boolean
 </script>
 
 <div class="grid grid-cols-2 items-center gap-4 p-2">
@@ -28,6 +23,7 @@
 			type="uncompleted"
 			{removeTask}
 			{toggleDone}
+			{editTodo}
 		/>
 	</div>
 	<div class="h-full">
@@ -37,6 +33,7 @@
 			type="completed"
 			{removeTask}
 			{toggleDone}
+			{editTodo}
 		/>
 	</div>
 </div>

@@ -62,6 +62,23 @@
 				return false
 		}
 	}
+	const editTodo = (
+		id: string,
+		fields: Pick<Task, "title" | "priority">,
+		type: ListType
+	) => {
+		if (type === "uncompleted") {
+			uncompletedTasks = uncompletedTasks.map((task) =>
+				task.id === id ? {...task, ...fields} : task
+			)
+			return true
+		}
+		completedTasks = completedTasks.map((task) =>
+			task.id === id ? {...task, ...fields} : task
+		)
+
+		return true
+	}
 </script>
 
 <svelte:head>
@@ -72,6 +89,12 @@
 <Page styles="p-0 flex flex-col justify-center bg-slate-100 ">
 	<div class="min-h-[20rem] shadow">
 		<AddTaskForm {addTodo} />
-		<ListGrid {uncompletedTasks} {completedTasks} {removeTask} {toggleDone} />
+		<ListGrid
+			{uncompletedTasks}
+			{completedTasks}
+			{removeTask}
+			{toggleDone}
+			{editTodo}
+		/>
 	</div>
 </Page>
