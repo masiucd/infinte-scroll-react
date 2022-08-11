@@ -18,8 +18,8 @@
 
 <ul
 	class={twMerge(
-		" p-1 rounded-sm shadow",
-		type === "completed" ? "bg-slate-400" : "bg-blue-400"
+		"p-1 rounded-md shadow",
+		type === "completed" ? "bg-blue-700" : "bg-blue-500"
 	)}
 >
 	{#if tasks.length === 0 && type === "uncompleted"}

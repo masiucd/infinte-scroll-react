@@ -35,15 +35,16 @@
 			checked={task.done}
 			wapperStyles="mb-0"
 			onChange={onChange(task.id, type)}
+			labelStyles="text-white"
 		/>
 		<div class="mr-3 flex gap-5">
 			<button
 				class="bg-transparent inline-block p-0 m-0 hover:bg-transparent hover:text-orange-500 text-slate-900"
 				on:click={toggleEdit}
-				>✎ {isEditOpen ? "⬆" : "⬇"}
+				><span class="mr-1">✏️</span> <span>{isEditOpen ? "⬆" : "⬇"}</span>
 			</button>
 			<button
-				class="bg-transparent  inline-block p-0 m-0 hover:bg-transparent hover:text-red-500 text-slate-900"
+				class="bg-transparent  inline-block p-0 m-0 hover:bg-transparent hover:text-orange-400 text-orange-100 text-lg"
 				on:click={() => {
 					removeTask(task.id, type)
 				}}>X</button

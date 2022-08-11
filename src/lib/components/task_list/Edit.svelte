@@ -17,9 +17,14 @@
 		type: ListType
 	) => boolean
 
-	export let newPrio: TaskStatus
-	export let newTitle: string
+	export let newPrio: TaskStatus | null = null
+	export let newTitle: string | null = null
 	export let toggleEdit: () => void
+
+	$: enabled = () => {
+		if (!newPrio && !newTitle) return false
+		return true
+	}
 </script>
 
 <div
@@ -38,12 +43,16 @@
 			<li>
 				<ButtonDefault
 					styles={`${
-						TaskStatuses.indexOf(newPrio) === i
+						newPrio !== null && TaskStatuses.indexOf(newPrio) === i
 							? "bg-orange-500 text-white p-1"
 							: ""
-					} p-[2px] `}
+					} p-[2px] text-white`}
 					onClick={() => {
-						newPrio = status
+						if (newPrio === status) {
+							newPrio = null
+						} else {
+							newPrio = status
+						}
 					}}><span>{status}</span></ButtonDefault
 				>
 			</li>
@@ -55,12 +64,13 @@
 			editTodo(
 				task.id,
 				{
-					title: newTitle.length > 0 ? newTitle : task.title,
-					priority: newPrio,
+					title: newTitle !== null ? newTitle : task.title,
+					priority: newPrio !== null ? newPrio : task.priority,
 				},
 				type
 			)
 			toggleEdit()
-		}}>Confirm</ButtonDefault
+		}}
+		disabled={!enabled()}>Confirm</ButtonDefault
 	>
 </div>
