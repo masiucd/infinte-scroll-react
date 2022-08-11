@@ -5,7 +5,6 @@
 	import AddTaskForm from "$lib/components/task_list/AddTaskForm.svelte"
 	import ListGrid from "$lib/components/task_list/ListGrid.svelte"
 	import Page from "$lib/Page.svelte"
-	import {genRandomString} from "$lib/util/helpers"
 	import {
 		staticTasks as tasks,
 		TaskStatus,
