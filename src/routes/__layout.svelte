@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import Nav from "$lib/components/layout/Nav.svelte"
 	import "../app.css"
 </script>

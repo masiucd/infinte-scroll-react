@@ -44,11 +44,11 @@
 			wapperStyles="mb-0"
 			onChange={onChange(task.id, type)}
 		/>
-		<div class="mr-3">
+		<div class="mr-3 flex gap-5">
 			<button
 				class="bg-transparent inline-block p-0 m-0 hover:bg-transparent hover:text-orange-500 text-slate-900"
 				on:click={toggleEdit}
-				>Edit
+				>✎ {isEditOpen ? "⬆" : "⬇"}
 			</button>
 			<button
 				class="bg-transparent  inline-block p-0 m-0 hover:bg-transparent hover:text-red-500 text-slate-900"
@@ -59,7 +59,9 @@
 		</div>
 	</div>
 	{#if isEditOpen}
-		<div class="flex justify-between items-center">
+		<div
+			class="flex justify-between items-center my-2 pb-2 border-b-2 border-blue-300 "
+		>
 			<div class="flex justify-between items-center gap-1">
 				<input
 					type="text"
@@ -72,9 +74,11 @@
 				{#each TaskStatuses as status, i}
 					<li>
 						<ButtonDefault
-							styles={TaskStatuses.indexOf(newPrio) === i
-								? "bg-orange-500 text-white p-1"
-								: ""}
+							styles={`${
+								TaskStatuses.indexOf(newPrio) === i
+									? "bg-orange-500 text-white p-1"
+									: ""
+							} p-[2px] `}
 							onClick={() => {
 								newPrio = status
 							}}><span>{status}</span></ButtonDefault
@@ -82,10 +86,9 @@
 					</li>
 				{/each}
 			</ul>
-			<button
-				class="bg-transparent  inline-block p-0 m-0 hover:bg-transparent hover:text-orange-500 text-slate-900"
-				type="button"
-				on:click={() => {
+			<ButtonDefault
+				styles="border border-blue-300 p-1 bg-slate-100 hover:bg-slate-50"
+				onClick={() => {
 					editTodo(
 						task.id,
 						{
@@ -95,7 +98,7 @@
 						type
 					)
 					toggleEdit()
-				}}>Confirm</button
+				}}>Confirm</ButtonDefault
 			>
 		</div>
 	{/if}
