@@ -2,6 +2,7 @@
 	import type {ListType, Task, TaskStatus} from "$lib/util/task"
 	import {staticTaskStatus, staticTasks as tasks} from "$lib/util/task"
 	import ButtonDefault from "../common/ButtonDefault.svelte"
+	import TaskBox from "./TaskBox.svelte"
 	import TaskList from "./TaskList.svelte"
 	// PROPS
 	export let uncompletedTasks: Task[]
@@ -28,30 +29,23 @@
 </script>
 
 <div class="grid grid-cols-2 items-center gap-4 p-2">
-	<div class="h-full">
-		<h3 class="text-2xl border-b-4 border-orange-400 inline-block mb-1">
-			Uncompled
-		</h3>
-		<TaskList
-			tasks={uncompletedTasks}
-			type="uncompleted"
-			{removeTask}
-			{toggleDone}
-			{editTodo}
-		/>
-	</div>
-	<div class="h-full">
-		<h3 class="text-2xl border-b-4 border-orange-400 inline-block mb-1">
-			Completed
-		</h3>
-		<TaskList
-			tasks={completedTasks}
-			type="completed"
-			{removeTask}
-			{toggleDone}
-			{editTodo}
-		/>
-	</div>
+	<TaskBox
+		title="Uncompleted"
+		type="uncompleted"
+		tasks={uncompletedTasks}
+		{removeTask}
+		{toggleDone}
+		{editTodo}
+	/>
+	<TaskBox
+		title="Completed"
+		type="completed"
+		tasks={completedTasks}
+		{removeTask}
+		{toggleDone}
+		{editTodo}
+	/>
+
 	<div>
 		<h4 class="text-xl border-b-4 border-orange-400 inline-block mb-1">
 			View tasks by priority
