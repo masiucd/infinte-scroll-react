@@ -1,4 +1,6 @@
 <script lang="ts">
+	import {getSelectedTaskStatus} from "$lib/util/helpers"
+
 	import {
 		staticTaskStatus as TaskStatuses,
 		TaskStatus,
@@ -25,6 +27,7 @@
 		if (!newPrio && !newTitle) return false
 		return true
 	}
+	$: selectedStatus = getSelectedTaskStatus
 </script>
 
 <div
@@ -43,7 +46,7 @@
 			<li>
 				<ButtonDefault
 					styles={`${
-						newPrio !== null && TaskStatuses.indexOf(newPrio) === i
+						selectedStatus(newPrio, i, TaskStatuses)
 							? "bg-orange-500 text-white p-1"
 							: ""
 					} p-[2px] text-white`}

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import {staticTaskStatus, TaskStatus, type Task} from "$lib/util/task"
+	import {getSelectedTaskStatus} from "$lib/util/helpers"
 	import ButtonDefault from "../common/ButtonDefault.svelte"
 	import FilteredTaskItems from "./FilteredTaskItems.svelte"
 
@@ -12,6 +13,7 @@
 	} else {
 		tasksByPrio = []
 	}
+	$: selectedStatus = getSelectedTaskStatus
 </script>
 
 <div>
@@ -19,12 +21,16 @@
 		View tasks by priority
 	</h4>
 	<ul class="flex gap-3">
-		{#each staticTaskStatus as taskStatus}
+		{#each staticTaskStatus as taskStatus, i}
 			<li>
 				<ButtonDefault
+					styles={`${
+						selectedStatus(selectedPrio, i, staticTaskStatus)
+							? "text-orange-500"
+							: ""
+					}`}
 					onClick={() => {
 						selectedPrio = taskStatus
-						return true
 					}}
 				>
 					<span>{taskStatus}</span>
@@ -33,9 +39,9 @@
 		{/each}
 		<li>
 			<ButtonDefault
+				styles={selectedPrio === null ? "text-orange-500" : ""}
 				onClick={() => {
 					selectedPrio = null
-					return true
 				}}
 			>
 				<span>NONE</span>
