@@ -1,9 +1,10 @@
 <script lang="ts">
 	import Nav from "$lib/components/layout/Nav.svelte"
 	import "../app.css"
+	const d = new Date().getFullYear()
 </script>
 
-<header class="">
+<header class="h-[6rem] shadow">
 	<h3 class="my-2 text-center">
 		<a
 			href="/"
@@ -14,8 +15,10 @@
 	<Nav />
 </header>
 
-<main class="min-h-[calc(100vh-9rem)] ">
+<main class="min-h-[calc(100vh-12rem)] ">
 	<slot />
 </main>
 
-<footer class="" />
+<footer class="h-[4.7rem] shadow flex justify-center items-center">
+	<small> © Svelte kitchen sink built with Sveltekit {d} </small>
+</footer>

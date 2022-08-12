@@ -1,7 +1,5 @@
 <script lang="ts">
 	import type {ListType, Task, TaskStatus} from "$lib/util/task"
-
-	import ButtonDefault from "../common/ButtonDefault.svelte"
 	import Checkbox from "../common/Checkbox.svelte"
 	import Edit from "./Edit.svelte"
 
