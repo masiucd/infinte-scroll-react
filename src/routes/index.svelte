@@ -1,4 +1,6 @@
 <script context="module" lang="ts">
+	import Title from "$lib/components/Title.svelte"
+
 	import Page from "$lib/Page.svelte"
 </script>
 
@@ -8,5 +10,5 @@
 </svelte:head>
 
 <Page>
-	<h1>Hello and welcome!</h1>
+	<Title text="Welcome" />
 </Page>

@@ -4,6 +4,7 @@
 <script lang="ts">
 	import AddTaskForm from "$lib/components/task_list/AddTaskForm.svelte"
 	import ListGrid from "$lib/components/task_list/ListGrid.svelte"
+	import Title from "$lib/components/Title.svelte"
 	import Page from "$lib/Page.svelte"
 	import {
 		staticTasks as tasks,
@@ -86,6 +87,7 @@
 </svelte:head>
 
 <Page styles="p-0 flex flex-col justify-center bg-slate-100 ">
+	<Title text="Task list" />
 	<div class="min-h-[20rem] shadow">
 		<AddTaskForm {addTodo} />
 		<ListGrid
