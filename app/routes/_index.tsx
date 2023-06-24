@@ -1,4 +1,5 @@
-import type {V2_MetaFunction} from "@remix-run/node";
+import {type ActionArgs, redirect, type V2_MetaFunction} from "@remix-run/node";
+import {Form} from "@remix-run/react";
 
 export const meta: V2_MetaFunction = () => {
   return [
@@ -10,6 +11,16 @@ export const meta: V2_MetaFunction = () => {
   ];
 };
 
+export const action = async ({request}: ActionArgs) => {
+  const body = await request.formData();
+  const date = body.get("date") as string | null;
+  const work = body.get("work") as string | null;
+  const learnings = body.get("learnings") as string | null;
+  const thoughts = body.get("thoughts") as string | null;
+  const text = body.get("text") as string | null;
+  return redirect("/");
+};
+
 export default function Index() {
   return (
     <div className="p-10">
@@ -18,6 +29,57 @@ export default function Index() {
         Learnings and thoughts about my work as a software developer. Updated
         weekly.
       </p>
+
+      <div className="max-w-lg border p-1">
+        <Form method="POST">
+          <p>Create a new entry</p>
+
+          <div className="flex flex-col gap-3">
+            <div>
+              <input
+                type="date"
+                name="date"
+                className="rounded border p-2 text-gray-900"
+              />
+            </div>
+
+            <div className="flex gap-5">
+              <div className="flex items-center gap-2">
+                <input type="radio" name="work" id="work" />
+                <label htmlFor="work">Work</label>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input type="radio" name="learnings" id="learnings" />
+                <label htmlFor="learnings">Learnings</label>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input type="radio" name="thoughts" id="thoughts" />
+                <label htmlFor="thoughts">Thoughts</label>
+              </div>
+            </div>
+
+            <div>
+              <textarea
+                name="text"
+                id="text"
+                placeholder="Write your entry here"
+                className="h-32 w-full rounded border p-2 text-gray-900"
+              />
+            </div>
+
+            <div className="flex justify-end">
+              <button
+                className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+                type="submit"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </Form>
+      </div>
 
       <section className="flex flex-col gap-2 p-1">
         <p className="mb-2 font-bold">
