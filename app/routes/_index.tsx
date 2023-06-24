@@ -8,5 +8,5 @@ export const meta: V2_MetaFunction = () => {
 };
 
 export default function Index() {
-  return <h1 className="bg-red-400 p-10">Hello</h1>;
+  return <h1 className="m-10  bg-red-400 p-10 text-blue-400 ">Hello</h1>;
 }
