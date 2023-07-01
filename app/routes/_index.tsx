@@ -1,7 +1,13 @@
-import {type ActionArgs, redirect, type V2_MetaFunction} from "@remix-run/node";
-import {Form} from "@remix-run/react";
+import {
+  type ActionArgs,
+  json,
+  redirect,
+  type V2_MetaFunction,
+} from "@remix-run/node";
+import {Form, useActionData} from "@remix-run/react";
 import type {ReactNode} from "react";
 
+import {createEntry} from "~/biz/entry/entry_manager.server";
 import {cn} from "~/lib/styles";
 
 export const meta: V2_MetaFunction = () => {
@@ -21,6 +27,24 @@ export async function action({request}: ActionArgs) {
   const learnings = body.get("learnings") as string | null;
   const thoughts = body.get("thoughts") as string | null;
   const text = body.get("text") as string | null;
+
+  const errors = {
+    text: text ? null : "Text is required",
+  };
+  const hasErrors = Object.values(errors).some(Boolean);
+  if (hasErrors) {
+    return json({errors});
+  }
+
+  await createEntry({
+    date: date,
+    types: {
+      work: Boolean(work),
+      learnings: Boolean(learnings),
+      thoughts: Boolean(thoughts),
+    },
+    text: text as string,
+  });
   // TODO store in database
   return redirect("/");
 }
@@ -34,6 +58,9 @@ function FormGroup({className, children}: FormGroupProps) {
 }
 
 export default function Index() {
+  const errors = useActionData<typeof action>();
+  console.log("errors", errors);
+
   return (
     <div className="p-10">
       <h1 className="mb-2 text-5xl font-bold">Work journal</h1>

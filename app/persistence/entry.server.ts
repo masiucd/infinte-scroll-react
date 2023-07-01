@@ -1,12 +1,12 @@
 import {db} from "~/utils/prisma.server";
 
-type EntryInsertRecord = {
+export type EntryInsertRecord = {
   text: string;
-  type: string;
-  createdAt: Date;
+  type: "learnings" | "work" | "thoughts";
+  createdAt?: Date;
 };
 
-export async function createEntry(input: EntryInsertRecord) {
+export async function insertEntry(input: EntryInsertRecord) {
   await db.entry.create({
     data: {
       ...input,
