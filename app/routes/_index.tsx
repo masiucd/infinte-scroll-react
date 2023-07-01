@@ -1,11 +1,7 @@
-import {
-  type ActionArgs,
-  json,
-  redirect,
-  type V2_MetaFunction,
-} from "@remix-run/node";
-import {Form, useActionData, useFetcher} from "@remix-run/react";
-import type {ReactNode} from "react";
+import {type ActionArgs, json, type V2_MetaFunction} from "@remix-run/node";
+import {useFetcher} from "@remix-run/react";
+import {format} from "date-fns";
+import {type ReactNode, useEffect, useRef} from "react";
 
 import {createEntry} from "~/biz/entry/entry_manager.server";
 import type {Type} from "~/biz/entry/schema";
@@ -38,14 +34,15 @@ export async function action({request}: ActionArgs) {
     return json({errors});
   }
 
-  // console.log("type", type);
-  await createEntry({
+  // simulate a slow request
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+
+  return await createEntry({
     date,
     type: type as Type, // can not be null because of the validation above
     text: text as string, // can not be null because of the validation above,
   });
-  // TODO store in database
-  return redirect("/");
+  // return redirect("/");
 }
 
 type FormGroupProps = {
@@ -58,9 +55,14 @@ function FormGroup({className, children}: FormGroupProps) {
 
 export default function Index() {
   const fetcher = useFetcher();
-  const errors = useActionData<typeof action>();
 
-  console.log(fetcher.state);
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  useEffect(() => {
+    if (textAreaRef.current && fetcher.state === "idle") {
+      textAreaRef.current.value = "";
+      textAreaRef.current.focus();
+    }
+  }, [fetcher.state]);
 
   return (
     <div className="p-10">
@@ -71,59 +73,66 @@ export default function Index() {
       </p>
       <div className="mb-5 max-w-lg border p-1">
         <fetcher.Form method="POST">
-          <p>Create a new entry</p>
-          <div className="flex flex-col gap-3">
-            <FormGroup>
-              <input
-                type="date"
-                name="date"
-                className="rounded border p-2 text-gray-900"
-              />
-            </FormGroup>
+          <fieldset
+            disabled={fetcher.state === "submitting"}
+            className="disabled:opacity-70"
+          >
+            <p>Create a new entry</p>
+            <div className="flex flex-col gap-3">
+              <FormGroup>
+                <input
+                  type="date"
+                  name="date"
+                  className="rounded border p-2 text-gray-900"
+                  defaultValue={format(new Date(), "yyyy-MM-dd")}
+                />
+              </FormGroup>
 
-            <FormGroup className="flex gap-5">
-              <div className="flex items-center gap-2">
-                <input type="radio" name="type" value="work" required />
-                <label>Work</label>
-              </div>
+              <FormGroup className="flex gap-5">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="type"
+                    value="work"
+                    defaultChecked
+                    required
+                  />
+                  <label>Work</label>
+                </div>
 
-              <div className="flex items-center gap-2">
-                <input type="radio" name="type" value="learnings" />
-                <label>Learnings</label>
-              </div>
+                <div className="flex items-center gap-2">
+                  <input type="radio" name="type" value="learnings" />
+                  <label>Learnings</label>
+                </div>
 
-              <div className="flex items-center gap-2">
-                <input type="radio" name="type" value="thoughts" />
-                <label>Thoughts</label>
-              </div>
-              {errors?.errors.type && (
-                <span className="text-red-500">{errors.errors.type}</span>
-              )}
-            </FormGroup>
+                <div className="flex items-center gap-2">
+                  <input type="radio" name="type" value="thoughts" />
+                  <label>Thoughts</label>
+                </div>
+              </FormGroup>
 
-            <FormGroup>
-              <textarea
-                name="text"
-                placeholder="Write your entry here"
-                className="h-32 w-full rounded border p-2 text-gray-900"
-                required
-              />
-              {errors?.errors.text && (
-                <span className="text-red-500">{errors.errors.text}</span>
-              )}
-            </FormGroup>
+              <FormGroup>
+                <textarea
+                  name="text"
+                  placeholder="Write your entry here"
+                  className="h-32 w-full rounded border p-2 text-gray-900"
+                  required
+                  ref={textAreaRef}
+                />
+              </FormGroup>
 
-            <FormGroup className="flex justify-end">
-              <Button
-                type="submit"
-                variant="primary"
-                size="default"
-                disabled={fetcher.state === "submitting"}
-              >
-                Save
-              </Button>
-            </FormGroup>
-          </div>
+              <FormGroup className="flex justify-end">
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="default"
+                  // disabled={fetcher.state === "submitting"}
+                >
+                  Save
+                </Button>
+              </FormGroup>
+            </div>
+          </fieldset>
         </fetcher.Form>
       </div>
 

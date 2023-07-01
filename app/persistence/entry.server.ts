@@ -7,7 +7,7 @@ export type EntryInsertRecord = {
 };
 
 export async function insertEntry(input: EntryInsertRecord) {
-  await db.entry.create({
+  return await db.entry.create({
     data: {
       ...input,
     },
