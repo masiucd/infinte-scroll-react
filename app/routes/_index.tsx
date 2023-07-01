@@ -4,10 +4,11 @@ import {
   redirect,
   type V2_MetaFunction,
 } from "@remix-run/node";
-import {Form, useActionData} from "@remix-run/react";
+import {Form, useActionData, useFetcher} from "@remix-run/react";
 import type {ReactNode} from "react";
 
 import {createEntry} from "~/biz/entry/entry_manager.server";
+import type {Type} from "~/biz/entry/schema";
 import {cn} from "~/lib/styles";
 import Button from "~/ui/button";
 
@@ -24,15 +25,12 @@ export const meta: V2_MetaFunction = () => {
 export async function action({request}: ActionArgs) {
   const body = await request.formData();
   const date = body.get("date") as string | null;
-  const work = body.get("work") as string | null;
-  const learnings = body.get("learnings") as string | null;
-  const thoughts = body.get("thoughts") as string | null;
+  const type = body.get("type") as string | null;
   const text = body.get("text") as string | null;
 
   const errors = {
     text: text ? null : "Text is required",
-    types:
-      work || learnings || thoughts ? null : "At least one type is required",
+    type: type ? null : "Type is required",
   };
   const hasErrors = Object.values(errors).some(Boolean);
 
@@ -40,13 +38,10 @@ export async function action({request}: ActionArgs) {
     return json({errors});
   }
 
+  // console.log("type", type);
   await createEntry({
-    date: date,
-    types: {
-      work: Boolean(work),
-      learnings: Boolean(learnings),
-      thoughts: Boolean(thoughts),
-    },
+    date,
+    type: type as Type, // can not be null because of the validation above
     text: text as string, // can not be null because of the validation above,
   });
   // TODO store in database
@@ -62,7 +57,10 @@ function FormGroup({className, children}: FormGroupProps) {
 }
 
 export default function Index() {
+  const fetcher = useFetcher();
   const errors = useActionData<typeof action>();
+
+  console.log(fetcher.state);
 
   return (
     <div className="p-10">
@@ -71,9 +69,8 @@ export default function Index() {
         Learnings and thoughts about my work as a software developer. Updated
         weekly.
       </p>
-
       <div className="mb-5 max-w-lg border p-1">
-        <Form method="POST">
+        <fetcher.Form method="POST">
           <p>Create a new entry</p>
           <div className="flex flex-col gap-3">
             <FormGroup>
@@ -86,30 +83,30 @@ export default function Index() {
 
             <FormGroup className="flex gap-5">
               <div className="flex items-center gap-2">
-                <input type="radio" name="work" id="work" />
-                <label htmlFor="work">Work</label>
+                <input type="radio" name="type" value="work" required />
+                <label>Work</label>
               </div>
 
               <div className="flex items-center gap-2">
-                <input type="radio" name="learnings" id="learnings" />
-                <label htmlFor="learnings">Learnings</label>
+                <input type="radio" name="type" value="learnings" />
+                <label>Learnings</label>
               </div>
 
               <div className="flex items-center gap-2">
-                <input type="radio" name="thoughts" id="thoughts" />
-                <label htmlFor="thoughts">Thoughts</label>
+                <input type="radio" name="type" value="thoughts" />
+                <label>Thoughts</label>
               </div>
-              {errors?.errors.types && (
-                <span className="text-red-500">{errors.errors.types}</span>
+              {errors?.errors.type && (
+                <span className="text-red-500">{errors.errors.type}</span>
               )}
             </FormGroup>
 
             <FormGroup>
               <textarea
                 name="text"
-                id="text"
                 placeholder="Write your entry here"
                 className="h-32 w-full rounded border p-2 text-gray-900"
+                required
               />
               {errors?.errors.text && (
                 <span className="text-red-500">{errors.errors.text}</span>
@@ -117,12 +114,17 @@ export default function Index() {
             </FormGroup>
 
             <FormGroup className="flex justify-end">
-              <Button type="submit" variant="primary" size="default">
+              <Button
+                type="submit"
+                variant="primary"
+                size="default"
+                disabled={fetcher.state === "submitting"}
+              >
                 Save
               </Button>
             </FormGroup>
           </div>
-        </Form>
+        </fetcher.Form>
       </div>
 
       <section className="flex flex-col gap-2 p-1">

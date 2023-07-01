@@ -1,20 +1,15 @@
+import {parseISO} from "date-fns";
+
 import {insertEntry} from "~/persistence/entry.server";
 
-import {type Input, InputSchema, type Type} from "./schema";
-
-function getType(types: Input["types"]): Type {
-  if (types.learnings) return "learnings";
-  if (types.work) return "work";
-  if (types.thoughts) return "thoughts";
-  throw new Error("No type selected");
-}
+import {type Input, InputSchema} from "./schema";
 
 export const createEntry = async (input: Input) => {
   const validatedInput = InputSchema.parse(input);
 
   await insertEntry({
     text: validatedInput.text,
-    type: getType(validatedInput.types),
-    createdAt: input.date ? new Date(input.date) : undefined,
+    type: input.type,
+    createdAt: input.date ? parseISO(input.date) : undefined,
   });
 };
