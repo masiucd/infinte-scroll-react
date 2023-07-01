@@ -9,6 +9,7 @@ import type {ReactNode} from "react";
 
 import {createEntry} from "~/biz/entry/entry_manager.server";
 import {cn} from "~/lib/styles";
+import Button from "~/ui/button";
 
 export const meta: V2_MetaFunction = () => {
   return [
@@ -30,8 +31,11 @@ export async function action({request}: ActionArgs) {
 
   const errors = {
     text: text ? null : "Text is required",
+    types:
+      work || learnings || thoughts ? null : "At least one type is required",
   };
   const hasErrors = Object.values(errors).some(Boolean);
+
   if (hasErrors) {
     return json({errors});
   }
@@ -43,7 +47,7 @@ export async function action({request}: ActionArgs) {
       learnings: Boolean(learnings),
       thoughts: Boolean(thoughts),
     },
-    text: text as string,
+    text: text as string, // can not be null because of the validation above,
   });
   // TODO store in database
   return redirect("/");
@@ -59,7 +63,6 @@ function FormGroup({className, children}: FormGroupProps) {
 
 export default function Index() {
   const errors = useActionData<typeof action>();
-  console.log("errors", errors);
 
   return (
     <div className="p-10">
@@ -96,6 +99,9 @@ export default function Index() {
                 <input type="radio" name="thoughts" id="thoughts" />
                 <label htmlFor="thoughts">Thoughts</label>
               </div>
+              {errors?.errors.types && (
+                <span className="text-red-500">{errors.errors.types}</span>
+              )}
             </FormGroup>
 
             <FormGroup>
@@ -105,15 +111,15 @@ export default function Index() {
                 placeholder="Write your entry here"
                 className="h-32 w-full rounded border p-2 text-gray-900"
               />
+              {errors?.errors.text && (
+                <span className="text-red-500">{errors.errors.text}</span>
+              )}
             </FormGroup>
 
             <FormGroup className="flex justify-end">
-              <button
-                className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-                type="submit"
-              >
+              <Button type="submit" variant="primary" size="default">
                 Save
-              </button>
+              </Button>
             </FormGroup>
           </div>
         </Form>
