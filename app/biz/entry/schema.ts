@@ -1,11 +1,7 @@
 import {z} from "zod";
 
 export const InputSchema = z.object({
-  date: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/)
-    .optional()
-    .nullable(),
+  date: z.string().optional().nullable(),
   text: z.string().min(1).max(1000),
   types: z.object({
     // Types

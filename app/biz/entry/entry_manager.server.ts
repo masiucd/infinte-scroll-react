@@ -11,7 +11,6 @@ function getType(types: Input["types"]): Type {
 
 export const createEntry = async (input: Input) => {
   const validatedInput = InputSchema.parse(input);
-  console.log("validateInput", validatedInput);
 
   await insertEntry({
     text: validatedInput.text,
