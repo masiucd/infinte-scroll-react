@@ -1,10 +1,11 @@
 import {type ActionArgs, json, type V2_MetaFunction} from "@remix-run/node";
-import {useFetcher} from "@remix-run/react";
+import {useFetcher, useLoaderData} from "@remix-run/react";
 import {format} from "date-fns";
 import {type ReactNode, useEffect, useRef} from "react";
 
-import {createEntry} from "~/biz/entry/entry_manager.server";
+import {createEntry, getEntries} from "~/biz/entry/entry_manager.server";
 import type {Type} from "~/biz/entry/schema";
+import {FormGroup} from "~/components/common/form_group";
 import {cn} from "~/lib/styles";
 import Button from "~/ui/button";
 
@@ -24,14 +25,15 @@ export async function action({request}: ActionArgs) {
   const type = body.get("type") as string | null;
   const text = body.get("text") as string | null;
 
-  const errors = {
-    text: text ? null : "Text is required",
-    type: type ? null : "Type is required",
-  };
-  const hasErrors = Object.values(errors).some(Boolean);
-
-  if (hasErrors) {
-    return json({errors});
+  if (!date || !type || !text) {
+    return json(
+      {
+        error: "Invalid request",
+      },
+      {
+        status: 400,
+      }
+    );
   }
 
   // simulate a slow request
@@ -39,22 +41,20 @@ export async function action({request}: ActionArgs) {
 
   return await createEntry({
     date,
-    type: type as Type, // can not be null because of the validation above
-    text: text as string, // can not be null because of the validation above,
+    type,
+    text,
   });
   // return redirect("/");
 }
 
-type FormGroupProps = {
-  className?: string;
-  children: ReactNode;
-};
-function FormGroup({className, children}: FormGroupProps) {
-  return <div className={cn("mb-1", className)}>{children}</div>;
+export async function loader() {
+  return await getEntries();
 }
 
 export default function Index() {
   const fetcher = useFetcher();
+  const data = useLoaderData();
+  console.log("data", data);
 
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   useEffect(() => {

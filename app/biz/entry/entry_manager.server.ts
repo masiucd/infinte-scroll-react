@@ -1,15 +1,19 @@
 import {parseISO} from "date-fns";
 
-import {insertEntry} from "~/persistence/entry.server";
+import * as entryDao from "~/persistence/entry.server";
 
 import {type Input, InputSchema} from "./schema";
 
-export const createEntry = async (input: Input) => {
+export async function createEntry(input: Input) {
   const validatedInput = InputSchema.parse(input);
 
-  return await insertEntry({
+  return await entryDao.insertEntry({
     text: validatedInput.text,
     type: input.type,
-    createdAt: input.date ? parseISO(input.date) : undefined,
+    createdAt: parseISO(input.date),
   });
-};
+}
+
+export async function getEntries(take = 10, skip = 0) {
+  return await entryDao.getEntries(take, skip);
+}
