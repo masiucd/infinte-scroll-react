@@ -54,6 +54,9 @@ export default function Index() {
   const data = useLoaderData<typeof loader>();
   console.log("data", data);
 
+  const keys = Object.keys(data);
+  console.log("keys", keys);
+
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   useEffect(() => {
     if (textAreaRef.current && fetcher.state === "idle") {
@@ -135,7 +138,24 @@ export default function Index() {
       </div>
 
       <section className="flex flex-col gap-2 p-1">
-        <p className="mb-2 font-bold">
+        {keys.map((key) => {
+          const entries = data[key];
+          return (
+            <div key={key}>
+              <p className="mb-2 font-bold">{key}</p>
+              <ul className="ml-5 flex flex-col gap-4">
+                {entries.map((entry) => {
+                  return (
+                    <li key={entry.id}>
+                      <p>{entry.text}</p>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          );
+        })}
+        {/* <p className="mb-2 font-bold">
           Week of July 19<sup>th</sup>, 2023
         </p>
 
@@ -163,7 +183,7 @@ export default function Index() {
               <li>Second item</li>
             </ul>
           </div>
-        </div>
+        </div> */}
       </section>
     </div>
   );

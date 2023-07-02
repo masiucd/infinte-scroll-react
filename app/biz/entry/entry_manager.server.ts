@@ -20,9 +20,9 @@ export async function getEntries(take = 10, skip = 0) {
   return groupEntries(entries);
 }
 
-function groupEntries(entries: Omit<Entry, "id" | "updatedAt">[]) {
+function groupEntries(entries: Omit<Entry, "updatedAt">[]) {
   return entries.reduce(
-    (store: Record<string, Omit<Entry, "id" | "updatedAt">[]>, entry) => {
+    (store: Record<string, Omit<Entry, "updatedAt">[]>, entry) => {
       // format to mont name dath and year
       const date = format(entry.createdAt, "MMMM dd, yyyy");
       if (store[date]) {
