@@ -1,12 +1,10 @@
 import {type ActionArgs, json, type V2_MetaFunction} from "@remix-run/node";
 import {useFetcher, useLoaderData} from "@remix-run/react";
 import {format} from "date-fns";
-import {type ReactNode, useEffect, useRef} from "react";
+import {useEffect, useRef} from "react";
 
-import {createEntry, getEntries} from "~/biz/entry/entry_manager.server";
-import type {Type} from "~/biz/entry/schema";
+import * as entryManager from "~/biz/entry/entry_manager.server";
 import {FormGroup} from "~/components/common/form_group";
-import {cn} from "~/lib/styles";
 import Button from "~/ui/button";
 
 export const meta: V2_MetaFunction = () => {
@@ -39,7 +37,7 @@ export async function action({request}: ActionArgs) {
   // simulate a slow request
   await new Promise((resolve) => setTimeout(resolve, 1000));
 
-  return await createEntry({
+  return await entryManager.createEntry({
     date,
     type,
     text,
@@ -48,12 +46,12 @@ export async function action({request}: ActionArgs) {
 }
 
 export async function loader() {
-  return await getEntries();
+  return await entryManager.getEntries();
 }
 
 export default function Index() {
   const fetcher = useFetcher();
-  const data = useLoaderData();
+  const data = useLoaderData<typeof loader>();
   console.log("data", data);
 
   const textAreaRef = useRef<HTMLTextAreaElement>(null);

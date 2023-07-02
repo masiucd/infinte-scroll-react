@@ -14,7 +14,7 @@ model Entry {
   id        Int      @id @default(autoincrement())
   type      String
   text      String
-  createdAt DateTime @default(now())
+  createdAt DateTime
   updatedAt DateTime @default(now())
 
   @@map("entries")
