@@ -1,6 +1,6 @@
 import {type ActionArgs, json, type V2_MetaFunction} from "@remix-run/node";
 import {useFetcher, useLoaderData} from "@remix-run/react";
-import {format} from "date-fns";
+import {format, parseISO, startOfWeek} from "date-fns";
 import {useEffect, useRef} from "react";
 
 import * as entryManager from "~/biz/entry/entry_manager.server";
@@ -52,10 +52,36 @@ export async function loader() {
 export default function Index() {
   const fetcher = useFetcher();
   const data = useLoaderData<typeof loader>();
-  console.log("data", data);
 
-  const keys = Object.keys(data);
-  console.log("keys", keys);
+  // TODO do this on the server
+  const entriesByWeek = data.reduce((acc, entry) => {
+    const sunday = startOfWeek(parseISO(entry.createdAt));
+    const sundayString = format(sunday, "yyyy-MM-dd");
+
+    if (!acc[sundayString]) {
+      acc[sundayString] = [];
+    }
+    acc[sundayString].push(entry);
+    return acc;
+  }, {} as Record<string, typeof data>);
+
+  const weeks = Object.keys(entriesByWeek)
+    .sort((a, b) => a.localeCompare(b))
+    .map(
+      (dateString) =>
+        ({
+          dateString,
+          work: entriesByWeek[dateString].filter((x) => x.type === "work"),
+          learnings: entriesByWeek[dateString].filter(
+            (x) => x.type === "learnings"
+          ),
+          thoughts: entriesByWeek[dateString].filter(
+            (x) => x.type === "thoughts"
+          ),
+        } as const)
+    );
+
+  console.log("weeks", weeks);
 
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   useEffect(() => {
@@ -138,23 +164,15 @@ export default function Index() {
       </div>
 
       <section className="flex flex-col gap-2 p-1">
-        {keys.map((key) => {
-          const entries = data[key];
-          return (
-            <div key={key}>
-              <p className="mb-2 font-bold">{key}</p>
-              <ul className="ml-5 flex flex-col gap-4">
-                {entries.map((entry) => {
-                  return (
-                    <li key={entry.id}>
-                      <p>{entry.text}</p>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          );
-        })}
+        <ul>
+          {data.map((x) => (
+            <li key={x.id}>
+              <p className="mb-2 font-bold">
+                {format(parseISO(x.createdAt), "MMMM dd")} <sup>th</sup>{" "}
+              </p>
+            </li>
+          ))}
+        </ul>
         {/* <p className="mb-2 font-bold">
           Week of July 19<sup>th</sup>, 2023
         </p>

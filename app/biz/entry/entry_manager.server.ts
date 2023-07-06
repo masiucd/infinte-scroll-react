@@ -15,23 +15,14 @@ export async function createEntry(input: Input) {
   });
 }
 
-export async function getEntries(take = 10, skip = 0) {
-  const entries = await entryDao.getEntries(take, skip);
-  return groupEntries(entries);
+function transform(entries: Array<Omit<Entry, "updatedAt">>) {
+  return entries.map((entry) => ({
+    ...entry,
+    // createdAt: format(entry.createdAt, "MMMM dd"),
+  }));
 }
 
-function groupEntries(entries: Omit<Entry, "updatedAt">[]) {
-  return entries.reduce(
-    (store: Record<string, Omit<Entry, "updatedAt">[]>, entry) => {
-      // format to mont name dath and year
-      const date = format(entry.createdAt, "MMMM dd, yyyy");
-      if (store[date]) {
-        store[date].push(entry);
-      } else {
-        store[date] = [entry];
-      }
-      return store;
-    },
-    {}
-  );
+export async function getEntries(take = 10, skip = 0) {
+  const entries = await entryDao.getEntries(take, skip);
+  return entries;
 }
