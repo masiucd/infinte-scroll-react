@@ -5,6 +5,7 @@ import {useEffect, useRef} from "react";
 
 import * as entryManager from "~/biz/entry/entry_manager.server";
 import {FormGroup} from "~/components/common/form_group";
+import {cn} from "~/lib/styles";
 import Button from "~/ui/button";
 
 export const meta: V2_MetaFunction = () => {
@@ -71,17 +72,15 @@ export default function Index() {
       (dateString) =>
         ({
           dateString,
-          work: entriesByWeek[dateString].filter((x) => x.type === "work"),
+          work: entriesByWeek[dateString].filter(({type}) => type === "work"),
           learnings: entriesByWeek[dateString].filter(
-            (x) => x.type === "learnings"
+            ({type}) => type === "learnings"
           ),
           thoughts: entriesByWeek[dateString].filter(
-            (x) => x.type === "thoughts"
+            ({type}) => type === "thoughts"
           ),
         } as const)
     );
-
-  console.log("weeks", weeks);
 
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   useEffect(() => {
@@ -164,15 +163,45 @@ export default function Index() {
       </div>
 
       <section className="flex flex-col gap-2 p-1">
-        <ul>
-          {data.map((x) => (
-            <li key={x.id}>
-              <p className="mb-2 font-bold">
-                {format(parseISO(x.createdAt), "MMMM dd")} <sup>th</sup>{" "}
-              </p>
-            </li>
-          ))}
-        </ul>
+        {weeks.map((week) => (
+          <div
+            key={week.dateString}
+            className="mb-2 flex flex-col gap-2 rounded bg-gray-900 p-2"
+          >
+            <p className="mb-2 font-bold">
+              Week of {format(parseISO(week.dateString), "MMMM do, yyyy")}
+            </p>
+
+            <div className={cn(week.work.length === 0 && "opacity-50")}>
+              <p className="mb-2">Work</p>
+              <ul className="ml-10 flex list-disc flex-col gap-3">
+                {week.work.map((work) => (
+                  <li key={work.id}>{work.text}</li>
+                ))}
+              </ul>
+            </div>
+
+            <div className={cn(week.learnings.length === 0 && "opacity-50")}>
+              <p className="mb-2">Learnings</p>
+              <ul className="ml-10 flex list-disc flex-col gap-3">
+                {week.learnings.map((learnings) => (
+                  <li key={learnings.id}>{learnings.text}</li>
+                ))}
+              </ul>
+            </div>
+
+            <div className={cn(week.thoughts.length === 0 && "opacity-50")}>
+              <p className="mb-2">Thoughts</p>
+              <ul className="ml-10 flex list-disc flex-col gap-3">
+                {week.thoughts.map((thoughts) => (
+                  <li key={thoughts.id}>{thoughts.text}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        ))}
+
+        {/* ***************** */}
         {/* <p className="mb-2 font-bold">
           Week of July 19<sup>th</sup>, 2023
         </p>
