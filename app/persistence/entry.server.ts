@@ -20,6 +20,7 @@ export async function getEntries(take = 10, skip = 0) {
       text: true,
       type: true,
       createdAt: true,
+      updatedAt: true,
     },
     orderBy: {
       createdAt: "desc",

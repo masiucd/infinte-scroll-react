@@ -1,6 +1,6 @@
 import {type ActionArgs, json, type V2_MetaFunction} from "@remix-run/node";
 import {useFetcher, useLoaderData} from "@remix-run/react";
-import {format, parseISO, startOfWeek} from "date-fns";
+import {format, parseISO} from "date-fns";
 import {useEffect, useRef} from "react";
 
 import * as entryManager from "~/biz/entry/entry_manager.server";
@@ -47,41 +47,12 @@ export async function action({request}: ActionArgs) {
 }
 
 export async function loader() {
-  return await entryManager.getEntries();
+  return await entryManager.getEntriesGroupedByWeeks();
 }
 
 export default function Index() {
   const fetcher = useFetcher();
   const data = useLoaderData<typeof loader>();
-
-  // TODO do this on the server
-  const entriesByWeek = data.reduce((acc, entry) => {
-    const sunday = startOfWeek(parseISO(entry.createdAt));
-    const sundayString = format(sunday, "yyyy-MM-dd");
-
-    if (!acc[sundayString]) {
-      acc[sundayString] = [];
-    }
-    acc[sundayString].push(entry);
-    return acc;
-  }, {} as Record<string, typeof data>);
-
-  const weeks = Object.keys(entriesByWeek)
-    .sort((a, b) => a.localeCompare(b))
-    .map(
-      (dateString) =>
-        ({
-          dateString,
-          work: entriesByWeek[dateString].filter(({type}) => type === "work"),
-          learnings: entriesByWeek[dateString].filter(
-            ({type}) => type === "learnings"
-          ),
-          thoughts: entriesByWeek[dateString].filter(
-            ({type}) => type === "thoughts"
-          ),
-        } as const)
-    );
-
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   useEffect(() => {
     if (textAreaRef.current && fetcher.state === "idle") {
@@ -163,74 +134,43 @@ export default function Index() {
       </div>
 
       <section className="flex flex-col gap-2 p-1">
-        {weeks.map((week) => (
+        {data.map(({dateString, work, learnings, thoughts}) => (
           <div
-            key={week.dateString}
+            key={dateString}
             className="mb-2 flex flex-col gap-2 rounded bg-gray-900 p-2"
           >
             <p className="mb-2 font-bold">
-              Week of {format(parseISO(week.dateString), "MMMM do, yyyy")}
+              Week of {format(parseISO(dateString), "MMMM do, yyyy")}
             </p>
 
-            <div className={cn(week.work.length === 0 && "opacity-50")}>
+            <div className={cn(work.length === 0 && "opacity-50")}>
               <p className="mb-2">Work</p>
               <ul className="ml-10 flex list-disc flex-col gap-3">
-                {week.work.map((work) => (
+                {work.map((work) => (
                   <li key={work.id}>{work.text}</li>
                 ))}
               </ul>
             </div>
 
-            <div className={cn(week.learnings.length === 0 && "opacity-50")}>
+            <div className={cn(learnings.length === 0 && "opacity-50")}>
               <p className="mb-2">Learnings</p>
               <ul className="ml-10 flex list-disc flex-col gap-3">
-                {week.learnings.map((learnings) => (
+                {learnings.map((learnings) => (
                   <li key={learnings.id}>{learnings.text}</li>
                 ))}
               </ul>
             </div>
 
-            <div className={cn(week.thoughts.length === 0 && "opacity-50")}>
+            <div className={cn(thoughts.length === 0 && "opacity-50")}>
               <p className="mb-2">Thoughts</p>
               <ul className="ml-10 flex list-disc flex-col gap-3">
-                {week.thoughts.map((thoughts) => (
+                {thoughts.map((thoughts) => (
                   <li key={thoughts.id}>{thoughts.text}</li>
                 ))}
               </ul>
             </div>
           </div>
         ))}
-
-        {/* ***************** */}
-        {/* <p className="mb-2 font-bold">
-          Week of July 19<sup>th</sup>, 2023
-        </p>
-
-        <div className="flex flex-col gap-4">
-          <div>
-            <p>Work</p>
-            <ul className="ml-10 list-disc">
-              <li>First item</li>
-              <li>Second item</li>
-            </ul>
-          </div>
-
-          <div>
-            <p>Learnings</p>
-            <ul className="ml-10 list-disc">
-              <li>First item</li>
-              <li>Second item</li>
-            </ul>
-          </div>
-
-          <div>
-            <p>Thoughts</p>
-            <ul className="ml-10 list-disc">
-              <li>First item</li>
-              <li>Second item</li>
-            </ul>
-          </div>
-        </div> */}
       </section>
     </div>
   );
