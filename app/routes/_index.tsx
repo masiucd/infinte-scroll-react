@@ -68,13 +68,16 @@ export default function Index() {
         Learnings and thoughts about my work as a software developer. Updated
         weekly.
       </p>
-      <div className="mb-5 max-w-lg border p-1">
+      <div className="mb-5 max-w-xl">
         <fetcher.Form method="POST">
           <fieldset
             disabled={fetcher.state === "submitting"}
-            className="disabled:opacity-70"
+            className="flex
+            flex-col gap-3 rounded border bg-gray-900 bg-gradient-to-r from-gray-900 to-sky-900 p-2 disabled:opacity-70 "
           >
-            <p>Create a new entry</p>
+            <legend className="mb-2 text-lg font-bold">
+              Create a new entry
+            </legend>
             <div className="flex flex-col gap-3">
               <FormGroup>
                 <input
@@ -119,12 +122,7 @@ export default function Index() {
               </FormGroup>
 
               <FormGroup className="flex justify-end">
-                <Button
-                  type="submit"
-                  variant="primary"
-                  size="default"
-                  // disabled={fetcher.state === "submitting"}
-                >
+                <Button type="submit" variant="primary" size="default">
                   Save
                 </Button>
               </FormGroup>
@@ -133,14 +131,14 @@ export default function Index() {
         </fetcher.Form>
       </div>
 
-      <section className="flex flex-col gap-2 p-1">
+      <section className="flex flex-col gap-2 space-y-2 p-1">
         {data.map(({dateString, work, learnings, thoughts}) => (
-          <div
-            key={dateString}
-            className="mb-2 flex flex-col gap-2 rounded bg-gray-900 p-2"
-          >
-            <p className="mb-2 font-bold">
-              Week of {format(parseISO(dateString), "MMMM do, yyyy")}
+          <div key={dateString} className="mb-2 flex flex-col gap-2 p-2">
+            <p className="relative mb-2 w-[fit-content] text-xl font-bold text-gray-300 drop-shadow-md">
+              <span className="rounded after:absolute after:bottom-1 after:left-0 after:h-2 after:w-full after:rotate-1 after:bg-blue-500 after:content-['']"></span>
+              <span className="relative">
+                Week of {format(parseISO(dateString), "MMMM do, yyyy")}
+              </span>
             </p>
 
             <div className={cn(work.length === 0 && "opacity-50")}>
