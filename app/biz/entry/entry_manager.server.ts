@@ -25,6 +25,14 @@ export async function getEntriesGroupedByWeeks(take = 10, skip = 0) {
   return transformWeeks(entriesByWeek);
 }
 
+export async function getEntryById(id: number) {
+  const entry = await entryDao.getEntryById(id);
+  if (entry) {
+    return entry;
+  }
+  return null;
+}
+
 type PromiseReturnType<T extends (...args: any[]) => Promise<any>> = T extends (
   ...args: any[]
 ) => Promise<infer R>

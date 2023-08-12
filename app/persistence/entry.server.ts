@@ -27,3 +27,7 @@ export async function getEntries(take = 10, skip = 0) {
     },
   });
 }
+
+export async function getEntryById(id: number) {
+  return await db.entry.findUnique({where: {id}});
+}

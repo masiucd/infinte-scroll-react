@@ -1,5 +1,5 @@
 import {type ActionArgs, json, type V2_MetaFunction} from "@remix-run/node";
-import {useFetcher, useLoaderData} from "@remix-run/react";
+import {Link, useFetcher, useLoaderData} from "@remix-run/react";
 import {format, parseISO} from "date-fns";
 import {useEffect, useRef} from "react";
 
@@ -73,7 +73,7 @@ export default function Index() {
           <fieldset
             disabled={fetcher.state === "submitting"}
             className="flex
-            flex-col gap-3 rounded border bg-gray-900 bg-gradient-to-r from-gray-900 to-sky-900 p-2 disabled:opacity-70 "
+            flex-col gap-3 rounded border bg-gray-900 bg-gradient-to-r from-gray-900 to-gray-700 p-2 disabled:opacity-70 "
           >
             <legend className="mb-2 text-lg font-bold">
               Create a new entry
@@ -154,7 +154,15 @@ export default function Index() {
               <p className="mb-2">Learnings</p>
               <ul className="ml-10 flex list-disc flex-col gap-3">
                 {learnings.map((learnings) => (
-                  <li key={learnings.id}>{learnings.text}</li>
+                  <li key={learnings.id} className="group flex gap-2">
+                    <span>{learnings.text}</span>
+                    <Link
+                      className="text-blue-500 opacity-0 group-hover:opacity-100"
+                      to={`/entries/${learnings.id}/edit`}
+                    >
+                      Edit
+                    </Link>
+                  </li>
                 ))}
               </ul>
             </div>
