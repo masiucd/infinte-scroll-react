@@ -1,12 +1,12 @@
 import {type ActionArgs, json, type V2_MetaFunction} from "@remix-run/node";
 import {Link, useFetcher, useLoaderData} from "@remix-run/react";
-import {format, parseISO} from "date-fns";
+import {format, parseISO, startOfWeek} from "date-fns";
 import {useEffect, useRef} from "react";
 
-import * as entryManager from "~/biz/entry/entry_manager.server";
 import {FormGroup} from "~/components/common/form_group";
 import {cn} from "~/lib/styles";
 import Button from "~/ui/button";
+import {db} from "~/utils/prisma.server";
 
 export const meta: V2_MetaFunction = () => {
   return [
@@ -18,11 +18,15 @@ export const meta: V2_MetaFunction = () => {
   ];
 };
 
+async function sleep(ms = 2000) {
+  return await new Promise((resolve) => setTimeout(resolve, 1000));
+}
+
 export async function action({request}: ActionArgs) {
   const body = await request.formData();
-  const date = body.get("date") as string | null;
-  const type = body.get("type") as string | null;
-  const text = body.get("text") as string | null;
+  const date = body.get("date");
+  const type = body.get("type");
+  const text = body.get("text");
 
   if (!date || !type || !text) {
     return json(
@@ -35,24 +39,34 @@ export async function action({request}: ActionArgs) {
     );
   }
 
-  // simulate a slow request
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  if (typeof text !== "string")
+    throw new Response("Text must be of type string", {status: 401});
+  if (typeof type !== "string")
+    throw new Response("type must be of type string", {status: 401});
+  if (typeof date !== "string")
+    throw new Response("date must be of type string", {status: 401});
 
-  return await entryManager.createEntry({
-    date,
-    type,
-    text,
+  // simulate a slow request
+  await sleep();
+  return await db.entry.create({
+    data: {
+      text,
+      type,
+      date: parseISO(date),
+    },
   });
   // return redirect("/");
 }
 
 export async function loader() {
-  return await entryManager.getEntriesGroupedByWeeks();
+  const entries = await db.entry.findMany();
+  console.log("entries", entries);
+  return entries;
 }
 
 export default function Index() {
   const fetcher = useFetcher();
-  const data = useLoaderData<typeof loader>();
+  const entries = useLoaderData<typeof loader>();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   useEffect(() => {
     if (textAreaRef.current && fetcher.state === "idle") {
@@ -132,7 +146,7 @@ export default function Index() {
       </div>
 
       <section className="flex flex-col gap-2 space-y-2 p-1">
-        {data.map(({dateString, work, learnings, thoughts}) => (
+        {/* {data.map(({dateString, work, learnings, thoughts}) => (
           <div key={dateString} className="mb-2 flex flex-col gap-2 p-2">
             <p className="relative mb-2 w-[fit-content] text-xl font-bold text-gray-300 drop-shadow-md">
               <span className="rounded after:absolute after:bottom-1 after:left-0 after:h-2 after:w-full after:rotate-1 after:bg-blue-500 after:content-['']"></span>
@@ -154,15 +168,8 @@ export default function Index() {
               <p className="mb-2">Learnings</p>
               <ul className="ml-10 flex list-disc flex-col gap-3">
                 {learnings.map((learnings) => (
-                  <li key={learnings.id} className="group flex gap-2">
-                    <span>{learnings.text}</span>
-                    <Link
-                      className="text-blue-500 opacity-0 group-hover:opacity-100"
-                      to={`/entries/${learnings.id}/edit`}
-                    >
-                      Edit
-                    </Link>
-                  </li>
+                  // @ts-ignore
+                  <EntryItem key={learnings.id} entry={learnings} />
                 ))}
               </ul>
             </div>
@@ -176,8 +183,29 @@ export default function Index() {
               </ul>
             </div>
           </div>
-        ))}
+        ))} */}
       </section>
     </div>
+  );
+}
+
+function EntryItem({
+  entry,
+}: {
+  entry: Awaited<ReturnType<typeof loader>>[number][
+    | "learnings"
+    | "thoughts"
+    | "work"][number];
+}) {
+  return (
+    <li key={entry.id} className="group flex gap-2">
+      <span>{entry.text}</span>
+      <Link
+        className="text-blue-500 opacity-0 group-hover:opacity-100"
+        to={`/entries/${entry.id}/edit`}
+      >
+        Edit
+      </Link>
+    </li>
   );
 }
