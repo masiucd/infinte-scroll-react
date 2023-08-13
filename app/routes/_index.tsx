@@ -1,4 +1,9 @@
-import {type ActionArgs, json, type V2_MetaFunction} from "@remix-run/node";
+import {
+  type ActionArgs,
+  json,
+  type SerializeFrom,
+  type V2_MetaFunction,
+} from "@remix-run/node";
 import {Link, useFetcher, useLoaderData} from "@remix-run/react";
 import {format, parseISO, startOfWeek} from "date-fns";
 import {useEffect, useRef} from "react";
@@ -8,7 +13,7 @@ import {cn} from "~/lib/styles";
 import Button from "~/ui/button";
 import {db} from "~/utils/prisma.server";
 
-export const meta: V2_MetaFunction = () => {
+export let meta: V2_MetaFunction = () => {
   return [
     {title: "My working journal"},
     {
@@ -23,10 +28,10 @@ async function sleep(ms = 2000) {
 }
 
 export async function action({request}: ActionArgs) {
-  const body = await request.formData();
-  const date = body.get("date");
-  const type = body.get("type");
-  const text = body.get("text");
+  let body = await request.formData();
+  let date = body.get("date");
+  let type = body.get("type");
+  let text = body.get("text");
 
   if (!date || !type || !text) {
     return json(
@@ -59,15 +64,66 @@ export async function action({request}: ActionArgs) {
 }
 
 export async function loader() {
-  const entries = await db.entry.findMany();
-  console.log("entries", entries);
-  return entries;
+  let entries = await db.entry.findMany();
+  return entries.map((entry) => ({
+    ...entry,
+    date: entry.date.toISOString().substring(0, 10),
+  }));
 }
 
-export default function Index() {
-  const fetcher = useFetcher();
-  const entries = useLoaderData<typeof loader>();
-  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+function groupEntriesByWeek(entries: SerializeFrom<typeof loader>) {
+  return entries.reduce<Record<string, typeof entries>>((obj, item) => {
+    let sunday = startOfWeek(parseISO(item.date));
+    let sundayString = format(sunday, "yyyy-MM-dd");
+    if (!obj[sundayString]) {
+      obj[sundayString] = [];
+    }
+    obj[sundayString].push(item);
+    return obj;
+  }, {});
+}
+
+function transformEntries(entries: SerializeFrom<typeof loader>) {
+  let entriesByWeek = groupEntriesByWeek(entries);
+  return [...Object.keys(entriesByWeek)]
+    .sort((a, b) => a.localeCompare(b))
+    .map((week) => ({
+      week,
+      work: entriesByWeek[week].filter((e) => e.type === "work"),
+      learnings: entriesByWeek[week].filter((e) => e.type === "learnings"),
+      thoughts: entriesByWeek[week].filter((e) => e.type === "thoughts"),
+    }));
+}
+
+export default function Main() {
+  let fetcher = useFetcher();
+  let entries = useLoaderData<typeof loader>();
+
+  // let entriesByWeek = entries.reduce<Record<string, typeof entries>>(
+  //   (obj, item) => {
+  //     let sunday = startOfWeek(parseISO(item.date));
+  //     let sundayString = format(sunday, "yyyy-MM-dd");
+  //     if (!obj[sundayString]) {
+  //       obj[sundayString] = [];
+  //     }
+  //     obj[sundayString].push(item);
+  //     return obj;
+  //   },
+  //   {}
+  // );
+  // let entriesByWeek = groupEntriesByWeek(entries);
+  // let weeks = [...Object.keys(entriesByWeek)]
+  //   .sort((a, b) => a.localeCompare(b))
+  //   .map((week) => ({
+  //     week,
+  //     work: entriesByWeek[week].filter((e) => e.type === "work"),
+  //     learnings: entriesByWeek[week].filter((e) => e.type === "learnings"),
+  //     thoughts: entriesByWeek[week].filter((e) => e.type === "thoughts"),
+  //   }));
+  let weeks = transformEntries(entries);
+  console.log("weeks", weeks);
+
+  let textAreaRef = useRef<HTMLTextAreaElement>(null);
   useEffect(() => {
     if (textAreaRef.current && fetcher.state === "idle") {
       textAreaRef.current.value = "";
@@ -146,56 +202,52 @@ export default function Index() {
       </div>
 
       <section className="flex flex-col gap-2 space-y-2 p-1">
-        {/* {data.map(({dateString, work, learnings, thoughts}) => (
-          <div key={dateString} className="mb-2 flex flex-col gap-2 p-2">
+        {weeks.map(({week, work, learnings, thoughts}) => (
+          <div key={week} className="mb-2 flex flex-col gap-2 p-2">
             <p className="relative mb-2 w-[fit-content] text-xl font-bold text-gray-300 drop-shadow-md">
               <span className="rounded after:absolute after:bottom-1 after:left-0 after:h-2 after:w-full after:rotate-1 after:bg-blue-500 after:content-['']"></span>
               <span className="relative">
-                Week of {format(parseISO(dateString), "MMMM do, yyyy")}
+                Week of {format(parseISO(week), "MMMM do, yyyy")}
               </span>
             </p>
 
             <div className={cn(work.length === 0 && "opacity-50")}>
               <p className="mb-2">Work</p>
-              <ul className="ml-10 flex list-disc flex-col gap-3">
-                {work.map((work) => (
-                  <li key={work.id}>{work.text}</li>
-                ))}
-              </ul>
+
+              <EntryList entries={work} />
             </div>
 
             <div className={cn(learnings.length === 0 && "opacity-50")}>
               <p className="mb-2">Learnings</p>
-              <ul className="ml-10 flex list-disc flex-col gap-3">
-                {learnings.map((learnings) => (
-                  // @ts-ignore
-                  <EntryItem key={learnings.id} entry={learnings} />
-                ))}
-              </ul>
+
+              <EntryList entries={learnings} />
             </div>
 
             <div className={cn(thoughts.length === 0 && "opacity-50")}>
               <p className="mb-2">Thoughts</p>
-              <ul className="ml-10 flex list-disc flex-col gap-3">
-                {thoughts.map((thoughts) => (
-                  <li key={thoughts.id}>{thoughts.text}</li>
-                ))}
-              </ul>
+              <EntryList entries={thoughts} />
             </div>
           </div>
-        ))} */}
+        ))}
       </section>
     </div>
+  );
+}
+
+function EntryList({entries}: {entries: Awaited<ReturnType<typeof loader>>}) {
+  return (
+    <ul className="ml-10 flex list-disc flex-col gap-3">
+      {entries.map((entry) => (
+        <EntryItem key={entry.id} entry={entry} />
+      ))}
+    </ul>
   );
 }
 
 function EntryItem({
   entry,
 }: {
-  entry: Awaited<ReturnType<typeof loader>>[number][
-    | "learnings"
-    | "thoughts"
-    | "work"][number];
+  entry: Awaited<ReturnType<typeof loader>>[number];
 }) {
   return (
     <li key={entry.id} className="group flex gap-2">
