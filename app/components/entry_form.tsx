@@ -1,6 +1,7 @@
 import {useFetcher} from "@remix-run/react";
-import {useRef} from "react";
 
+import {cn} from "~/lib/styles";
+// import {useRef} from "react";
 import Button from "~/ui/button";
 
 import {FormGroup} from "./common/form_group";
@@ -16,13 +17,15 @@ type Props = {
 
 export function EntryForm({entry}: Props) {
   let fetcher = useFetcher();
-  let textAreaRef = useRef<HTMLTextAreaElement>(null);
-
+  // let textAreaRef = useRef<HTMLTextAreaElement>(null);
   return (
     <fetcher.Form method="POST">
       <fieldset
         disabled={fetcher.state === "submitting"}
-        className="flex flex-col gap-3 rounded border p-2 disabled:opacity-70 "
+        className={cn(
+          "flex flex-col gap-3 rounded border p-2 disabled:opacity-70",
+          fetcher.state === "submitting" && "animate-pulse"
+        )}
       >
         <legend className="mb-2 text-lg font-bold">Create a new entry</legend>
         <div className="flex flex-col gap-3">
@@ -31,7 +34,6 @@ export function EntryForm({entry}: Props) {
               type="date"
               name="date"
               className="rounded border p-2 text-gray-900"
-              // defaultValue={format(new Date(), "yyyy-MM-dd")}
               defaultValue={entry.date}
             />
           </FormGroup>
@@ -75,11 +77,11 @@ export function EntryForm({entry}: Props) {
               placeholder="Write your entry here"
               className="h-32 w-full rounded border p-2 text-gray-900"
               required
-              ref={textAreaRef}
+              // ref={textAreaRef}
               defaultValue={entry.text}
             />
           </FormGroup>
-
+          <input type="hidden" name="id" value={entry.id} />
           <FormGroup className="flex justify-end">
             <Button type="submit" variant="primary" size="default">
               Save

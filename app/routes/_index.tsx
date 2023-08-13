@@ -10,6 +10,7 @@ import {transformEntries} from "~/lib/entry/server-fns.server";
 import {cn} from "~/lib/styles";
 import Button from "~/ui/button";
 import {db} from "~/utils/prisma.server";
+import {sleep} from "~/utils/sleep";
 
 export let meta: V2_MetaFunction = () => {
   return [
@@ -20,10 +21,6 @@ export let meta: V2_MetaFunction = () => {
     },
   ];
 };
-
-async function sleep(ms = 2000) {
-  return await new Promise((resolve) => setTimeout(resolve, 1000));
-}
 
 export async function action({request}: ActionArgs) {
   let body = await request.formData();
@@ -81,7 +78,7 @@ export default function Main() {
           <fieldset
             disabled={fetcher.state === "submitting"}
             className="flex
-            flex-col gap-3 rounded border bg-gray-900 bg-gradient-to-r from-gray-900 to-gray-700 p-2 disabled:opacity-70 "
+            flex-col gap-3 rounded border  p-2 disabled:opacity-70 "
           >
             <legend className="mb-2 text-lg font-bold">
               Create a new entry
@@ -168,7 +165,7 @@ function Entry({entries, type}: EntryProps) {
   return (
     <div className={cn(entries.length === 0 && "opacity-50")}>
       <p className="mb-2 capitalize">{type}</p>
-      <ul className="ml-10 flex list-disc flex-col gap-3">
+      <ul className="ml-10 flex list-inside list-disc flex-col gap-1">
         {entries.map((entry) => (
           <EntryItem key={entry.id} entry={entry} />
         ))}
@@ -188,10 +185,10 @@ function EntryItem({
   };
 }) {
   return (
-    <li key={entry.id} className="group flex gap-2">
+    <li key={entry.id} className="group list-item ">
       <span>{entry.text}</span>
       <Link
-        className="text-blue-500 opacity-0 transition-opacity duration-200 ease-in-out hover:text-gray-100 group-hover:opacity-100"
+        className="ml-1 text-blue-500 opacity-0 transition-opacity duration-200 ease-in-out hover:text-gray-100 group-hover:opacity-100"
         to={`/entries/${entry.id}/edit`}
       >
         Edit

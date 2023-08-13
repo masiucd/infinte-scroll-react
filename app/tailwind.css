@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+base {
+  @apply font-sans;
+}
+
 html {
   @apply bg-gray-950 text-gray-100;
+}
+
+@layer base {
+  ul,
+  ol {
+    list-style: revert;
+  }
 }
