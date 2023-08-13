@@ -1,11 +1,12 @@
 import {Entry} from "@prisma/client";
 import {type ActionArgs, json, type V2_MetaFunction} from "@remix-run/node";
 import {Link, useFetcher, useLoaderData} from "@remix-run/react";
-import {format, parseISO, startOfWeek} from "date-fns";
+import {format, parseISO} from "date-fns";
 import {useEffect, useRef} from "react";
 import invariant from "tiny-invariant";
 
 import {FormGroup} from "~/components/common/form_group";
+import {transformEntries} from "~/lib/entry/server-fns.server";
 import {cn} from "~/lib/styles";
 import Button from "~/ui/button";
 import {db} from "~/utils/prisma.server";
@@ -58,36 +59,8 @@ export async function action({request}: ActionArgs) {
 
 export async function loader() {
   let entries = await db.entry.findMany();
-  let weeks = transformEntriesTwo(entries);
+  let weeks = transformEntries(entries);
   return weeks;
-}
-
-function groupEntriesByWeekTwo(entries: Entry[]) {
-  let entryList = entries.map((e) => ({
-    ...e,
-    date: e.date.toISOString().substring(0, 10),
-  }));
-  return entryList.reduce<Record<string, typeof entryList>>((obj, item) => {
-    let sunday = startOfWeek(parseISO(item.date));
-    let sundayString = format(sunday, "yyyy-MM-dd");
-    if (!obj[sundayString]) {
-      obj[sundayString] = [];
-    }
-    obj[sundayString].push(item);
-    return obj;
-  }, {});
-}
-
-function transformEntriesTwo(entries: Entry[]) {
-  let entriesByWeek = groupEntriesByWeekTwo(entries);
-  return [...Object.keys(entriesByWeek)]
-    .sort((a, b) => a.localeCompare(b))
-    .map((week) => ({
-      week,
-      work: entriesByWeek[week].filter(({type}) => type === "work"),
-      learnings: entriesByWeek[week].filter(({type}) => type === "learnings"),
-      thoughts: entriesByWeek[week].filter(({type}) => type === "thoughts"),
-    }));
 }
 
 export default function Main() {
@@ -102,12 +75,7 @@ export default function Main() {
   }, [fetcher.state]);
 
   return (
-    <div className="p-10">
-      <h1 className="mb-2 text-5xl font-bold">Work journal</h1>
-      <p className="mb-4 text-lg text-gray-300">
-        Learnings and thoughts about my work as a software developer. Updated
-        weekly.
-      </p>
+    <div>
       <div className="mb-5 max-w-xl">
         <fetcher.Form method="POST">
           <fieldset
@@ -170,7 +138,6 @@ export default function Main() {
           </fieldset>
         </fetcher.Form>
       </div>
-
       <section className="flex flex-col gap-2 space-y-2 p-1">
         {weeks.map(({week, work, learnings, thoughts}) => (
           <div key={week} className="mb-2 flex flex-col gap-2 p-2">
@@ -224,7 +191,7 @@ function EntryItem({
     <li key={entry.id} className="group flex gap-2">
       <span>{entry.text}</span>
       <Link
-        className="text-blue-500 opacity-0 group-hover:opacity-100"
+        className="text-blue-500 opacity-0 transition-opacity duration-200 ease-in-out hover:text-gray-100 group-hover:opacity-100"
         to={`/entries/${entry.id}/edit`}
       >
         Edit
