@@ -1,3 +1,4 @@
+import type {Entry} from "@prisma/client";
 import {
   type ActionArgs,
   json,
@@ -5,8 +6,9 @@ import {
   type V2_MetaFunction,
 } from "@remix-run/node";
 import {Link, useFetcher, useLoaderData} from "@remix-run/react";
-import {format, parseISO, startOfWeek} from "date-fns";
+import {format, parse, parseISO, startOfWeek} from "date-fns";
 import {useEffect, useRef} from "react";
+import invariant from "tiny-invariant";
 
 import {FormGroup} from "~/components/common/form_group";
 import {cn} from "~/lib/styles";
@@ -44,12 +46,9 @@ export async function action({request}: ActionArgs) {
     );
   }
 
-  if (typeof text !== "string")
-    throw new Response("Text must be of type string", {status: 401});
-  if (typeof type !== "string")
-    throw new Response("type must be of type string", {status: 401});
-  if (typeof date !== "string")
-    throw new Response("date must be of type string", {status: 401});
+  invariant(typeof text === "string");
+  invariant(typeof type === "string");
+  invariant(typeof date === "string");
 
   // simulate a slow request
   await sleep();
@@ -60,19 +59,20 @@ export async function action({request}: ActionArgs) {
       date: parseISO(date),
     },
   });
-  // return redirect("/");
 }
 
 export async function loader() {
   let entries = await db.entry.findMany();
-  return entries.map((entry) => ({
-    ...entry,
-    date: entry.date.toISOString().substring(0, 10),
-  }));
+  let weeks = transformEntriesTwo(entries);
+  return weeks;
 }
 
-function groupEntriesByWeek(entries: SerializeFrom<typeof loader>) {
-  return entries.reduce<Record<string, typeof entries>>((obj, item) => {
+function groupEntriesByWeekTwo(entries: Entry[]) {
+  const xs = entries.map((e) => ({
+    ...e,
+    date: e.date.toISOString().substring(0, 10),
+  }));
+  return xs.reduce<Record<string, typeof xs>>((obj, item) => {
     let sunday = startOfWeek(parseISO(item.date));
     let sundayString = format(sunday, "yyyy-MM-dd");
     if (!obj[sundayString]) {
@@ -83,46 +83,46 @@ function groupEntriesByWeek(entries: SerializeFrom<typeof loader>) {
   }, {});
 }
 
-function transformEntries(entries: SerializeFrom<typeof loader>) {
-  let entriesByWeek = groupEntriesByWeek(entries);
+function transformEntriesTwo(entries: Entry[]) {
+  let entriesByWeek = groupEntriesByWeekTwo(entries);
   return [...Object.keys(entriesByWeek)]
     .sort((a, b) => a.localeCompare(b))
     .map((week) => ({
       week,
-      work: entriesByWeek[week].filter((e) => e.type === "work"),
-      learnings: entriesByWeek[week].filter((e) => e.type === "learnings"),
-      thoughts: entriesByWeek[week].filter((e) => e.type === "thoughts"),
+      work: entriesByWeek[week].filter(({type}) => type === "work"),
+      learnings: entriesByWeek[week].filter(({type}) => type === "learnings"),
+      thoughts: entriesByWeek[week].filter(({type}) => type === "thoughts"),
     }));
 }
 
+// TODO to this on the server
+// function groupEntriesByWeek(entries: SerializeFrom<typeof loader>) {
+//   return entries.reduce<Record<string, typeof entries>>((obj, item) => {
+//     let sunday = startOfWeek(parseISO(item.date));
+//     let sundayString = format(sunday, "yyyy-MM-dd");
+//     if (!obj[sundayString]) {
+//       obj[sundayString] = [];
+//     }
+//     obj[sundayString].push(item);
+//     return obj;
+//   }, {});
+// }
+
+// function transformEntries(entries: SerializeFrom<typeof loader>) {
+//   let entriesByWeek = groupEntriesByWeek(entries);
+//   return [...Object.keys(entriesByWeek)]
+//     .sort((a, b) => a.localeCompare(b))
+//     .map((week) => ({
+//       week,
+//       work: entriesByWeek[week].filter(({type}) => type === "work"),
+//       learnings: entriesByWeek[week].filter(({type}) => type === "learnings"),
+//       thoughts: entriesByWeek[week].filter(({type}) => type === "thoughts"),
+//     }));
+// }
+
 export default function Main() {
   let fetcher = useFetcher();
-  let entries = useLoaderData<typeof loader>();
-
-  // let entriesByWeek = entries.reduce<Record<string, typeof entries>>(
-  //   (obj, item) => {
-  //     let sunday = startOfWeek(parseISO(item.date));
-  //     let sundayString = format(sunday, "yyyy-MM-dd");
-  //     if (!obj[sundayString]) {
-  //       obj[sundayString] = [];
-  //     }
-  //     obj[sundayString].push(item);
-  //     return obj;
-  //   },
-  //   {}
-  // );
-  // let entriesByWeek = groupEntriesByWeek(entries);
-  // let weeks = [...Object.keys(entriesByWeek)]
-  //   .sort((a, b) => a.localeCompare(b))
-  //   .map((week) => ({
-  //     week,
-  //     work: entriesByWeek[week].filter((e) => e.type === "work"),
-  //     learnings: entriesByWeek[week].filter((e) => e.type === "learnings"),
-  //     thoughts: entriesByWeek[week].filter((e) => e.type === "thoughts"),
-  //   }));
-  let weeks = transformEntries(entries);
-  console.log("weeks", weeks);
-
+  let weeks = useLoaderData<typeof loader>();
   let textAreaRef = useRef<HTMLTextAreaElement>(null);
   useEffect(() => {
     if (textAreaRef.current && fetcher.state === "idle") {
@@ -234,7 +234,14 @@ export default function Main() {
   );
 }
 
-function EntryList({entries}: {entries: Awaited<ReturnType<typeof loader>>}) {
+function EntryList({
+  entries,
+}: {
+  entries: Awaited<ReturnType<typeof loader>>[number][
+    | "learnings"
+    | "thoughts"
+    | "work"];
+}) {
   return (
     <ul className="ml-10 flex list-disc flex-col gap-3">
       {entries.map((entry) => (
@@ -247,7 +254,12 @@ function EntryList({entries}: {entries: Awaited<ReturnType<typeof loader>>}) {
 function EntryItem({
   entry,
 }: {
-  entry: Awaited<ReturnType<typeof loader>>[number];
+  entry: {
+    id: number;
+    text: string;
+    date: string;
+    type: string;
+  };
 }) {
   return (
     <li key={entry.id} className="group flex gap-2">
