@@ -7,6 +7,7 @@ import invariant from "tiny-invariant";
 
 import {FormGroup} from "~/components/common/form_group";
 import {transformEntries} from "~/lib/entry/server-fns.server";
+import {Icons} from "~/lib/icons";
 import {cn} from "~/lib/styles";
 import Button from "~/ui/button";
 import {db} from "~/utils/prisma.server";
@@ -191,7 +192,7 @@ function EntryItem({
         className="ml-1 text-blue-500 opacity-0 transition-opacity duration-200 ease-in-out hover:text-gray-100 group-hover:opacity-100"
         to={`/entries/${entry.id}/edit`}
       >
-        Edit
+        <Icons.Pen size={16} />
       </Link>
     </li>
   );
