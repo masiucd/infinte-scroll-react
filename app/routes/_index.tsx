@@ -1,12 +1,7 @@
-import type {Entry} from "@prisma/client";
-import {
-  type ActionArgs,
-  json,
-  type SerializeFrom,
-  type V2_MetaFunction,
-} from "@remix-run/node";
+import {Entry} from "@prisma/client";
+import {type ActionArgs, json, type V2_MetaFunction} from "@remix-run/node";
 import {Link, useFetcher, useLoaderData} from "@remix-run/react";
-import {format, parse, parseISO, startOfWeek} from "date-fns";
+import {format, parseISO, startOfWeek} from "date-fns";
 import {useEffect, useRef} from "react";
 import invariant from "tiny-invariant";
 
@@ -68,11 +63,11 @@ export async function loader() {
 }
 
 function groupEntriesByWeekTwo(entries: Entry[]) {
-  const xs = entries.map((e) => ({
+  let entryList = entries.map((e) => ({
     ...e,
     date: e.date.toISOString().substring(0, 10),
   }));
-  return xs.reduce<Record<string, typeof xs>>((obj, item) => {
+  return entryList.reduce<Record<string, typeof entryList>>((obj, item) => {
     let sunday = startOfWeek(parseISO(item.date));
     let sundayString = format(sunday, "yyyy-MM-dd");
     if (!obj[sundayString]) {
@@ -94,31 +89,6 @@ function transformEntriesTwo(entries: Entry[]) {
       thoughts: entriesByWeek[week].filter(({type}) => type === "thoughts"),
     }));
 }
-
-// TODO to this on the server
-// function groupEntriesByWeek(entries: SerializeFrom<typeof loader>) {
-//   return entries.reduce<Record<string, typeof entries>>((obj, item) => {
-//     let sunday = startOfWeek(parseISO(item.date));
-//     let sundayString = format(sunday, "yyyy-MM-dd");
-//     if (!obj[sundayString]) {
-//       obj[sundayString] = [];
-//     }
-//     obj[sundayString].push(item);
-//     return obj;
-//   }, {});
-// }
-
-// function transformEntries(entries: SerializeFrom<typeof loader>) {
-//   let entriesByWeek = groupEntriesByWeek(entries);
-//   return [...Object.keys(entriesByWeek)]
-//     .sort((a, b) => a.localeCompare(b))
-//     .map((week) => ({
-//       week,
-//       work: entriesByWeek[week].filter(({type}) => type === "work"),
-//       learnings: entriesByWeek[week].filter(({type}) => type === "learnings"),
-//       thoughts: entriesByWeek[week].filter(({type}) => type === "thoughts"),
-//     }));
-// }
 
 export default function Main() {
   let fetcher = useFetcher();
@@ -205,28 +175,14 @@ export default function Main() {
         {weeks.map(({week, work, learnings, thoughts}) => (
           <div key={week} className="mb-2 flex flex-col gap-2 p-2">
             <p className="relative mb-2 w-[fit-content] text-xl font-bold text-gray-300 drop-shadow-md">
-              <span className="rounded after:absolute after:bottom-1 after:left-0 after:h-2 after:w-full after:rotate-1 after:bg-blue-500 after:content-['']"></span>
-              <span className="relative">
+              <span className="rounded after:absolute after:bottom-1 after:left-0 after:h-2 after:w-full after:rotate-1 after:bg-blue-700 after:content-['']"></span>
+              <span className="relative drop-shadow-lg">
                 Week of {format(parseISO(week), "MMMM do, yyyy")}
               </span>
             </p>
-
-            <div className={cn(work.length === 0 && "opacity-50")}>
-              <p className="mb-2">Work</p>
-
-              <EntryList entries={work} />
-            </div>
-
-            <div className={cn(learnings.length === 0 && "opacity-50")}>
-              <p className="mb-2">Learnings</p>
-
-              <EntryList entries={learnings} />
-            </div>
-
-            <div className={cn(thoughts.length === 0 && "opacity-50")}>
-              <p className="mb-2">Thoughts</p>
-              <EntryList entries={thoughts} />
-            </div>
+            <Entry entries={work} type="work" />
+            <Entry entries={learnings} type="learnings" />
+            <Entry entries={thoughts} type="thoughts" />
           </div>
         ))}
       </section>
@@ -234,20 +190,23 @@ export default function Main() {
   );
 }
 
-function EntryList({
-  entries,
-}: {
+type EntryProps = {
   entries: Awaited<ReturnType<typeof loader>>[number][
     | "learnings"
     | "thoughts"
     | "work"];
-}) {
+  type: string;
+};
+function Entry({entries, type}: EntryProps) {
   return (
-    <ul className="ml-10 flex list-disc flex-col gap-3">
-      {entries.map((entry) => (
-        <EntryItem key={entry.id} entry={entry} />
-      ))}
-    </ul>
+    <div className={cn(entries.length === 0 && "opacity-50")}>
+      <p className="mb-2 capitalize">{type}</p>
+      <ul className="ml-10 flex list-disc flex-col gap-3">
+        {entries.map((entry) => (
+          <EntryItem key={entry.id} entry={entry} />
+        ))}
+      </ul>
+    </div>
   );
 }
 
