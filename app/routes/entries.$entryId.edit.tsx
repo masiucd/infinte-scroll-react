@@ -1,7 +1,7 @@
 import type {LoaderArgs} from "@remix-run/node";
 import {useLoaderData} from "@remix-run/react";
-import {format, parseISO} from "date-fns";
 
+import {EntryForm} from "~/components/entry_form";
 import {db} from "~/utils/prisma.server";
 
 export async function loader({params}: LoaderArgs) {
@@ -9,7 +9,7 @@ export async function loader({params}: LoaderArgs) {
   if (!entryId || typeof entryId !== "string") {
     throw new Response("Non found", {status: 404});
   }
-  const entry = await db.entry.findUnique({
+  let entry = await db.entry.findUnique({
     where: {
       id: parseInt(entryId, 10),
     },
@@ -24,13 +24,10 @@ export async function loader({params}: LoaderArgs) {
 }
 
 export default function Page() {
-  const entry = useLoaderData<typeof loader>();
-
+  let entry = useLoaderData<typeof loader>();
   return (
-    <div>
-      <p>{entry.text}</p>
-      <p>{entry.type}</p>
-      <p>{format(parseISO(entry.date), "yyyy-MM-dd")}</p>
+    <div className="mb-5 max-w-xl">
+      <EntryForm entry={entry} />
     </div>
   );
 }
