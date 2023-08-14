@@ -186,13 +186,18 @@ function EntryItem({
   };
 }) {
   return (
-    <li key={entry.id} className="group list-item ">
-      <span>{entry.text}</span>
+    <li key={entry.id} className="group flex">
       <Link
-        className="ml-1 text-blue-500 opacity-0 transition-opacity duration-200 ease-in-out hover:text-gray-100 group-hover:opacity-100"
+        className="list-item transition-opacity duration-200 ease-in-out hover:text-gray-100 "
         to={`/entries/${entry.id}/edit`}
       >
-        <Icons.Pen size={16} />
+        <span className="group-hover:opacity-75">{entry.text}</span>
+        <span className="transition-colors duration-150 hover:text-blue-500">
+          <Icons.Pen
+            size={16}
+            className="ml-1 inline text-blue-500 opacity-0 transition-opacity duration-200 ease-in-out hover:text-gray-100 group-hover:opacity-100"
+          />
+        </span>
       </Link>
     </li>
   );
