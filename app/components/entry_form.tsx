@@ -30,7 +30,7 @@ export function EntryForm({entry}: Props) {
       textAreaRef.current.focus();
     }
   }, [fetcher.state, fetcher.type]);
-  const isWorking = fetcher.state !== "idle";
+  let isWorking = fetcher.state !== "idle";
   return (
     <fetcher.Form method="POST">
       <fieldset
@@ -49,7 +49,6 @@ export function EntryForm({entry}: Props) {
               defaultValue={entry?.date ?? format(new Date(), "yyyy-MM-dd")}
             />
           </FormGroup>
-
           <FormGroup className="flex gap-5">
             {[
               {
@@ -77,7 +76,6 @@ export function EntryForm({entry}: Props) {
               </div>
             ))}
           </FormGroup>
-
           <FormGroup>
             <textarea
               name="text"
@@ -88,7 +86,6 @@ export function EntryForm({entry}: Props) {
               defaultValue={entry?.text}
             />
           </FormGroup>
-          <input type="hidden" name="id" value={entry?.id} />
           <FormGroup className="flex justify-end">
             <Button type="submit" variant="primary" size="default">
               {isWorking ? "Saving..." : "Save"}

@@ -7,7 +7,6 @@ import invariant from "tiny-invariant";
 import {EntryForm} from "~/components/entry_form";
 import {transformEntries} from "~/lib/entry/server-fns.server";
 import {Icons} from "~/lib/icons";
-import {cn} from "~/lib/styles";
 import {db} from "~/utils/prisma.server";
 import {sleep} from "~/utils/sleep";
 
@@ -93,8 +92,9 @@ type EntryProps = {
   type: string;
 };
 function Entry({entries, type}: EntryProps) {
+  if (entries.length === 0) return null;
   return (
-    <div className={cn(entries.length === 0 && "opacity-50")}>
+    <div>
       <p className="mb-2 capitalize">{type}</p>
       <ul className="ml-10 flex list-inside list-disc flex-col gap-1">
         {entries.map((entry) => (

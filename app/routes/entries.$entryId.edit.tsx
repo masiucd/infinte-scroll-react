@@ -1,13 +1,9 @@
-import {
-  type ActionArgs,
-  json,
-  type LoaderArgs,
-  redirect,
-} from "@remix-run/node";
-import {useLoaderData} from "@remix-run/react";
+import {type ActionArgs, type LoaderArgs, redirect} from "@remix-run/node";
+import {Form, useLoaderData} from "@remix-run/react";
 import {add, parseISO} from "date-fns";
 import invariant from "tiny-invariant";
 
+import {deleteEntry, updateEntry} from "~/biz/entry.server";
 import {EntryForm} from "~/components/entry_form";
 import {db} from "~/utils/prisma.server";
 import {sleep} from "~/utils/sleep";
@@ -31,41 +27,28 @@ export async function loader({params}: LoaderArgs) {
   };
 }
 
-export async function action({request}: ActionArgs) {
+export async function action({request, params}: ActionArgs) {
   let body = await request.formData();
-  let id = body.get("id");
-  let date = body.get("date");
-  let type = body.get("type");
-  let text = body.get("text");
+  let id = params.entryId;
+  let {date, type, text, _action} = Object.fromEntries(body);
+  if (_action === "delete") {
+    await deleteEntry(Number(id));
+  } else {
+    invariant(typeof text === "string");
+    invariant(typeof type === "string");
+    invariant(typeof date === "string");
+    invariant(typeof id === "string");
 
-  if (!date || !type || !text || !id) {
-    return json(
-      {
-        error: "Invalid request",
-      },
-      {
-        status: 400,
-      }
-    );
-  }
-
-  invariant(typeof text === "string");
-  invariant(typeof type === "string");
-  invariant(typeof date === "string");
-  invariant(typeof id === "string");
-
-  // simulate a slow request
-  await sleep();
-  await db.entry.update({
-    where: {
-      id: parseInt(id, 10),
-    },
-    data: {
+    // simulate a slow request
+    await sleep();
+    await updateEntry({
+      id,
       text,
       type,
-      date: add(parseISO(date), {days: 1}),
-    },
-  });
+      date,
+    });
+  }
+
   return redirect("/");
 }
 
@@ -74,6 +57,25 @@ export default function Page() {
   return (
     <div className="mb-5 max-w-xl">
       <EntryForm entry={entry} />
+      <div className="mt-2">
+        <Form
+          method="post"
+          onSubmit={(e) => {
+            if (!confirm("Are you sure?")) {
+              e.preventDefault();
+            }
+          }}
+        >
+          <button
+            name="_action"
+            value="delete"
+            className="w-44 truncate  px-2 py-1 font-bold underline opacity-70 hover:opacity-100"
+            type="submit"
+          >
+            Delete <span className="italic">{entry.text}</span>
+          </button>
+        </Form>
+      </div>
     </div>
   );
 }
