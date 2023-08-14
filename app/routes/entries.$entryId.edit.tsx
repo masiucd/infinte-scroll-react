@@ -38,13 +38,6 @@ export async function action({request}: ActionArgs) {
   let type = body.get("type");
   let text = body.get("text");
 
-  console.log({
-    id,
-    date,
-    type,
-    text,
-  });
-
   if (!date || !type || !text || !id) {
     return json(
       {

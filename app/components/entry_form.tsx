@@ -30,16 +30,16 @@ export function EntryForm({entry}: Props) {
       textAreaRef.current.focus();
     }
   }, [fetcher.state, fetcher.type]);
+  const isWorking = fetcher.state !== "idle";
   return (
     <fetcher.Form method="POST">
       <fieldset
-        disabled={fetcher.state === "submitting"}
+        disabled={isWorking}
         className={cn(
           "flex flex-col gap-3 rounded border p-2 disabled:opacity-70",
-          fetcher.state === "submitting" && "animate-pulse"
+          isWorking && "animate-pulse"
         )}
       >
-        <legend className="mb-2 text-lg font-bold">Create a new entry</legend>
         <div className="flex flex-col gap-3">
           <FormGroup>
             <input
@@ -91,7 +91,7 @@ export function EntryForm({entry}: Props) {
           <input type="hidden" name="id" value={entry?.id} />
           <FormGroup className="flex justify-end">
             <Button type="submit" variant="primary" size="default">
-              Save
+              {isWorking ? "Saving..." : "Save"}
             </Button>
           </FormGroup>
         </div>
