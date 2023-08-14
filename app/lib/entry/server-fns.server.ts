@@ -7,7 +7,7 @@ function groupEntriesByWeek(entries: Entry[]) {
     date: e.date.toISOString().substring(0, 10),
   }));
   return entryList.reduce<Record<string, typeof entryList>>((obj, item) => {
-    let sunday = startOfWeek(parseISO(item.date));
+    let sunday = startOfWeek(parseISO(item.date), {weekStartsOn: 1});
     let sundayString = format(sunday, "yyyy-MM-dd");
     if (!obj[sundayString]) {
       obj[sundayString] = [];

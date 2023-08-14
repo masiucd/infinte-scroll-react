@@ -1,15 +1,13 @@
 import {Entry} from "@prisma/client";
 import {type ActionArgs, json, type V2_MetaFunction} from "@remix-run/node";
-import {Link, useFetcher, useLoaderData} from "@remix-run/react";
-import {format, parseISO} from "date-fns";
-import {useEffect, useRef} from "react";
+import {Link, useLoaderData} from "@remix-run/react";
+import {add, format, parseISO} from "date-fns";
 import invariant from "tiny-invariant";
 
-import {FormGroup} from "~/components/common/form_group";
+import {EntryForm} from "~/components/entry_form";
 import {transformEntries} from "~/lib/entry/server-fns.server";
 import {Icons} from "~/lib/icons";
 import {cn} from "~/lib/styles";
-import Button from "~/ui/button";
 import {db} from "~/utils/prisma.server";
 import {sleep} from "~/utils/sleep";
 
@@ -50,7 +48,7 @@ export async function action({request}: ActionArgs) {
     data: {
       text,
       type,
-      date: parseISO(date),
+      date: add(parseISO(date), {days: 1}),
     },
   });
 }
@@ -62,79 +60,11 @@ export async function loader() {
 }
 
 export default function Main() {
-  let fetcher = useFetcher();
   let weeks = useLoaderData<typeof loader>();
-  let textAreaRef = useRef<HTMLTextAreaElement>(null);
-  useEffect(() => {
-    if (textAreaRef.current && fetcher.state === "idle") {
-      textAreaRef.current.value = "";
-      textAreaRef.current.focus();
-    }
-  }, [fetcher.state]);
-
   return (
     <div>
       <div className="mb-5 max-w-xl">
-        <fetcher.Form method="POST">
-          <fieldset
-            disabled={fetcher.state === "submitting"}
-            className="flex
-            flex-col gap-3 rounded border  p-2 disabled:opacity-70 "
-          >
-            <legend className="mb-2 text-lg font-bold">
-              Create a new entry
-            </legend>
-            <div className="flex flex-col gap-3">
-              <FormGroup>
-                <input
-                  type="date"
-                  name="date"
-                  className="rounded border p-2 text-gray-900"
-                  defaultValue={format(new Date(), "yyyy-MM-dd")}
-                />
-              </FormGroup>
-
-              <FormGroup className="flex gap-5">
-                <div className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name="type"
-                    value="work"
-                    defaultChecked
-                    required
-                  />
-                  <label>Work</label>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <input type="radio" name="type" value="learnings" />
-                  <label>Learnings</label>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <input type="radio" name="type" value="thoughts" />
-                  <label>Thoughts</label>
-                </div>
-              </FormGroup>
-
-              <FormGroup>
-                <textarea
-                  name="text"
-                  placeholder="Write your entry here"
-                  className="h-32 w-full rounded border p-2 text-gray-900"
-                  required
-                  ref={textAreaRef}
-                />
-              </FormGroup>
-
-              <FormGroup className="flex justify-end">
-                <Button type="submit" variant="primary" size="default">
-                  Save
-                </Button>
-              </FormGroup>
-            </div>
-          </fieldset>
-        </fetcher.Form>
+        <EntryForm />
       </div>
       <section className="flex flex-col gap-2 space-y-2 p-1">
         {weeks.map(({week, work, learnings, thoughts}) => (

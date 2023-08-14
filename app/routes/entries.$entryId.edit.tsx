@@ -5,7 +5,7 @@ import {
   redirect,
 } from "@remix-run/node";
 import {useLoaderData} from "@remix-run/react";
-import {parseISO} from "date-fns";
+import {add, parseISO} from "date-fns";
 import invariant from "tiny-invariant";
 
 import {EntryForm} from "~/components/entry_form";
@@ -38,6 +38,13 @@ export async function action({request}: ActionArgs) {
   let type = body.get("type");
   let text = body.get("text");
 
+  console.log({
+    id,
+    date,
+    type,
+    text,
+  });
+
   if (!date || !type || !text || !id) {
     return json(
       {
@@ -63,7 +70,7 @@ export async function action({request}: ActionArgs) {
     data: {
       text,
       type,
-      date: parseISO(date),
+      date: add(parseISO(date), {days: 1}),
     },
   });
   return redirect("/");
