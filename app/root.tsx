@@ -1,5 +1,4 @@
-// import {cssBundleHref} from "@remix-run/css-bundle";
-import type {LinksFunction} from "@remix-run/node";
+import type {LinksFunction, V2_MetaFunction} from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -16,6 +15,23 @@ import {cn} from "./lib/styles";
 export const links: LinksFunction = () => [
   {rel: "stylesheet", href: stylesheet},
 ];
+
+export const meta: V2_MetaFunction = () => {
+  return [
+    {
+      title:
+        "My working journal | Marcell Ciszek Druzynski - Software Developer",
+    },
+    {
+      name: "description",
+      content: "My working journal is a place where I write about my work..",
+    },
+    {
+      property: "og:title",
+      content: "My working journal",
+    },
+  ];
+};
 
 export default function App() {
   return (
