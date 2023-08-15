@@ -1,10 +1,5 @@
 import {type ActionArgs, type LoaderArgs, redirect} from "@remix-run/node";
-import {
-  Form,
-  useLoaderData,
-  useNavigate,
-  useSearchParams,
-} from "@remix-run/react";
+import {useLoaderData, useNavigate} from "@remix-run/react";
 import invariant from "tiny-invariant";
 
 import {deleteEntry, updateEntry} from "~/biz/entry.server";
@@ -57,36 +52,18 @@ export async function action({request, params}: ActionArgs) {
 }
 
 export default function Page() {
-  let [searchParams] = useSearchParams();
   let navigate = useNavigate();
   let entry = useLoaderData<typeof loader>();
   return (
     <div className="mb-5 max-w-xl">
       <EntryForm entry={entry} />
       <div className="mt-2">
-        {/* <Form
-          method="post"
-          onSubmit={(e) => {
-            // TODO:https://www.drewis.cool/story/route-based-modals-with-remix-post
-            if (!confirm("Are you sure?")) {
-              e.preventDefault();
-            }
-          }}
-        >
-          <button
-            name="_action"
-            value="delete"
-            className="w-44 truncate  px-2 py-1 font-bold underline opacity-70 hover:opacity-100"
-            type="submit"
-          >
-            Delete <span className="italic">{entry.text}</span>
-          </button>
-        </Form> */}
-
         <button
           className="w-44 truncate  px-2 py-1 font-bold underline opacity-70 hover:opacity-100"
           onClick={() => {
-            navigate("/entries/26/edit?open_modal=true");
+            navigate(
+              `/entries/${entry.id}/edit?open_modal=true&id=${entry.id}`
+            );
           }}
         >
           Delete <span className="italic">{entry.text}</span>

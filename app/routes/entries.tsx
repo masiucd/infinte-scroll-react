@@ -1,4 +1,5 @@
 import {
+  Form,
   Outlet,
   useLocation,
   useNavigate,
@@ -19,6 +20,7 @@ export default function Page() {
     }
   }, [navigate, pathname]);
 
+  let id = searchParams.get("id");
   return (
     <>
       <PageWrapper>
@@ -29,18 +31,27 @@ export default function Page() {
         </p>
         <Outlet />
       </PageWrapper>
-      {searchParams.get("open_modal") === "true" && (
+      {searchParams.get("open_modal") === "true" && id !== null && (
         <div className="fixed inset-0 z-50 flex h-screen w-screen items-center justify-center bg-black/50 ">
           <section className="bg-white p-2 text-gray-900">
             <button
               onClick={() => {
                 navigate(-1);
-                console.log("navigate");
               }}
             >
               Close
             </button>
             <p>Modal component</p>
+            <Form method="post" action={`/entries/${id}/edit`}>
+              <button
+                name="_action"
+                value="delete"
+                className="w-44 truncate  px-2 py-1 font-bold underline opacity-70 hover:opacity-100"
+                type="submit"
+              >
+                Delete
+              </button>
+            </Form>
           </section>
         </div>
       )}
