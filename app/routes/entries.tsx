@@ -5,9 +5,12 @@ import {
   useNavigate,
   useSearchParams,
 } from "@remix-run/react";
+import {AnimatePresence, motion} from "framer-motion";
 import {useEffect} from "react";
 
 import {PageWrapper} from "~/components/common/page_wrapper";
+import {Icons} from "~/lib/icons";
+import Button from "~/ui/button";
 
 export default function Page() {
   let [searchParams] = useSearchParams();
@@ -31,30 +34,57 @@ export default function Page() {
         </p>
         <Outlet />
       </PageWrapper>
-      {searchParams.get("open_modal") === "true" && id !== null && (
-        <div className="fixed inset-0 z-50 flex h-screen w-screen items-center justify-center bg-black/50 ">
-          <section className="bg-white p-2 text-gray-900">
-            <button
-              onClick={() => {
-                navigate(-1);
-              }}
+      <AnimatePresence>
+        {searchParams.get("open_modal") === "true" && id !== null && (
+          <div className="fixed inset-0 z-50 flex h-screen w-screen items-center justify-center bg-black/50 ">
+            <motion.section
+              initial={{opacity: 0, scale: 0.5}}
+              animate={{opacity: 1, scale: 1}}
+              exit={{opacity: 0, scale: 0.5, transition: {duration: 0.1}}}
+              transition={{duration: 0.2}}
+              role="dialog"
+              className="flex min-h-[12rem] min-w-[22rem] flex-col rounded-md border-4 border-red-400 bg-white p-1 text-gray-900"
             >
-              Close
-            </button>
-            <p>Modal component</p>
-            <Form method="post" action={`/entries/${id}/edit`}>
-              <button
-                name="_action"
-                value="delete"
-                className="w-44 truncate  px-2 py-1 font-bold underline opacity-70 hover:opacity-100"
-                type="submit"
-              >
-                Delete
-              </button>
-            </Form>
-          </section>
-        </div>
-      )}
+              <div className="flex justify-between bg-green-300">
+                <p>Modal component</p>
+                <button
+                  onClick={() => {
+                    navigate(-1);
+                  }}
+                >
+                  <Icons.X className="h-6 w-6 text-gray-900 transition-colors duration-200 hover:text-gray-500" />
+                </button>
+              </div>
+
+              <div className="flex flex-1 items-center border-4 border-red-300">
+                <p>
+                  Are you sure you want to delete this entry? This action cannot
+                </p>
+              </div>
+
+              <div className="flex justify-end gap-2 border px-4">
+                <Form method="post" action={`/entries/${id}/edit`}>
+                  <Button
+                    name="_action"
+                    value="delete"
+                    type="submit"
+                    variant="primary"
+                  >
+                    Delete
+                  </Button>
+                </Form>
+                <Button
+                  onClick={() => {
+                    navigate(-1);
+                  }}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </motion.section>
+          </div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

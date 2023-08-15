@@ -1,7 +1,9 @@
-import {type Icon, PenTool} from "react-feather";
+import {Delete, type Icon, PenTool, X} from "react-feather";
 
 export let Icons = Object.freeze({
   Pen: PenTool,
+  Delete,
+  X,
 });
 
 export type MyIcon = Icon;

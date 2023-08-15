@@ -8,9 +8,9 @@ export let buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          "bg-blue-500 font-bold tracking-wide text-white transition-opacity duration-150 hover:opacity-40",
+          "bg-blue-600 font-bold tracking-wide text-white transition-opacity duration-150 hover:opacity-40",
         secondary: "bg-gray-200",
-        default: "bg-gray-500",
+        default: "bg-gray-100 font-bold hover:bg-gray-200 hover:shadow-lg",
         ghost: "bg-transparent",
       },
       size: {
