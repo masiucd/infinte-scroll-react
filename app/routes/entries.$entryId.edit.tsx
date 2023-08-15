@@ -1,6 +1,5 @@
 import {type ActionArgs, type LoaderArgs, redirect} from "@remix-run/node";
 import {Form, useLoaderData} from "@remix-run/react";
-import {add, parseISO} from "date-fns";
 import invariant from "tiny-invariant";
 
 import {deleteEntry, updateEntry} from "~/biz/entry.server";
@@ -49,7 +48,7 @@ export async function action({request, params}: ActionArgs) {
     });
   }
 
-  return redirect("/");
+  return redirect("/entries/list");
 }
 
 export default function Page() {
@@ -61,6 +60,7 @@ export default function Page() {
         <Form
           method="post"
           onSubmit={(e) => {
+            // TODO:https://www.drewis.cool/story/route-based-modals-with-remix-post
             if (!confirm("Are you sure?")) {
               e.preventDefault();
             }

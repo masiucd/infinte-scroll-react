@@ -2,7 +2,7 @@ import {cva, type VariantProps} from "class-variance-authority";
 
 import {cn} from "~/lib/styles";
 
-export const buttonVariants = cva(
+export let buttonVariants = cva(
   "rounded px-2 py-1 text-sm shadow disabled:cursor-not-allowed disabled:opacity-30",
   {
     variants: {
