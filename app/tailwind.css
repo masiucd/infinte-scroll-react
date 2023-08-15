@@ -2,12 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-base {
-  @apply font-sans;
-}
-
 html {
-  @apply bg-gray-950 text-gray-100;
+  @apply bg-gray-950 text-gray-100 font-mono;
 }
 
 @layer base {
