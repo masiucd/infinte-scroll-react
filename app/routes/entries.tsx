@@ -5,7 +5,6 @@ import {
   useNavigate,
   useSearchParams,
 } from "@remix-run/react";
-import {AnimatePresence, motion} from "framer-motion";
 import {useEffect} from "react";
 
 import {Dialog} from "~/components/common/dialog";
@@ -27,7 +26,7 @@ export default function Page() {
   let id = searchParams.get("id");
   return (
     <>
-      <PageWrapper>
+      <PageWrapper className="py-10">
         <h1 className="mb-2 text-5xl font-bold">Work journal</h1>
         <p className="mb-4 text-lg text-gray-300">
           Learnings and thoughts about my work as a software developer. Updated
@@ -37,10 +36,18 @@ export default function Page() {
       </PageWrapper>
       <Dialog open={searchParams.get("open_modal") === "true" && id !== null}>
         <Dialog.Header>
-          <p>Modal component</p>
+          <p className="text-lg font-bold tracking-tighter">Delete entry</p>
+          <button
+            className="rounded-full p-1 hover:bg-gray-300"
+            onClick={() => {
+              navigate(-1);
+            }}
+          >
+            <Icons.X />
+          </button>
         </Dialog.Header>
         <Dialog.Body>
-          <p>Are you sure you want to delete this entry? This action cannot</p>
+          <p>Are you sure you want to delete this entry?</p>
         </Dialog.Body>
         <Dialog.Footer>
           <Form method="post" action={`/entries/${id}/edit`}>
