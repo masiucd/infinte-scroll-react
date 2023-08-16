@@ -21,7 +21,7 @@ export default function Page() {
   return (
     <PageWrapper>
       <h1>My working journal</h1>
-      <ul className="flex gap-2">
+      <ul className="flex flex-col gap-2 ">
         {AppRoutes.map((r) => (
           <li key={r.title}>
             <Link to={r.to}>{r.title}</Link>

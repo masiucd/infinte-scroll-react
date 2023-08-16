@@ -14,7 +14,15 @@ import {cn} from "./lib/styles";
 
 export const links: LinksFunction = () => [
   {rel: "stylesheet", href: stylesheet},
+  {
+    rel: "stylesheet",
+    href: "https://fonts.googleapis.com/css2?family=Play:wght@400;700&display=swap",
+  },
 ];
+
+// {/* <link rel="preconnect" href="https://fonts.googleapis.com">
+// <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+// <link href="https://fonts.googleapis.com/css2?family=Play:wght@400;700&display=swap" rel="stylesheet"></link> */}
 
 export const meta: V2_MetaFunction = () => {
   return [
@@ -42,7 +50,7 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body className={cn("bg-gray-950 text-gray-100")}>
+      <body className={cn("bg-gray-950 text-gray-100 font-serif")}>
         <Outlet />
         <ScrollRestoration />
         <Scripts />

@@ -48,7 +48,7 @@ export async function action({request, params}: ActionArgs) {
     });
   }
 
-  return redirect("/entries/list");
+  return redirect("/entries");
 }
 
 export default function Page() {

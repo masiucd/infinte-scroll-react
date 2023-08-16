@@ -58,6 +58,7 @@ export async function loader() {
   return weeks;
 }
 
+// Leaf route
 export default function Page() {
   let weeks = useLoaderData<typeof loader>();
   return (
@@ -95,8 +96,8 @@ function Entry({entries, type}: EntryProps) {
   if (entries.length === 0) return null;
   return (
     <div>
-      <p className="mb-2 capitalize">{type}</p>
-      <ul className="ml-10 flex list-inside list-disc flex-col gap-1">
+      <p className="mb-2 font-bold capitalize">{type}</p>
+      <ul className="ml-10 flex flex-col gap-1">
         {entries.map((entry) => (
           <EntryItem key={entry.id} entry={entry} />
         ))}
@@ -116,16 +117,19 @@ function EntryItem({
   };
 }) {
   return (
-    <li key={entry.id} className="group flex">
+    <li
+      key={entry.id}
+      className="group flex items-center before:mr-1 before:content-['ƛ']"
+    >
       <Link
-        className="list-item transition-opacity duration-200 ease-in-out hover:text-gray-100 "
+        className="flex items-center gap-2  py-1 leading-6 transition-opacity duration-200 ease-in-out hover:text-gray-100"
         to={`/entries/${entry.id}/edit`}
       >
         <span className="group-hover:opacity-75">{entry.text}</span>
         <span className="transition-colors duration-150 hover:text-blue-500">
-          <Icons.Pen
+          <Icons.Edit
             size={16}
-            className="ml-1 inline text-blue-500 opacity-0 transition-opacity duration-200 ease-in-out hover:text-gray-100 group-hover:opacity-100"
+            className="text-blue-500 opacity-0 transition-opacity duration-200 ease-in-out hover:text-gray-100 group-hover:opacity-100"
           />
         </span>
       </Link>

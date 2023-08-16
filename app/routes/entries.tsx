@@ -1,28 +1,14 @@
-import {
-  Form,
-  Outlet,
-  useLocation,
-  useNavigate,
-  useSearchParams,
-} from "@remix-run/react";
-import {useEffect} from "react";
+import {Form, Outlet, useNavigate, useSearchParams} from "@remix-run/react";
 
 import {Dialog} from "~/components/common/dialog";
 import {PageWrapper} from "~/components/common/page_wrapper";
 import {Icons} from "~/lib/icons";
 import Button from "~/ui/button";
 
+// Layout route
 export default function Page() {
   let [searchParams] = useSearchParams();
   let navigate = useNavigate();
-  let {pathname} = useLocation();
-
-  useEffect(() => {
-    if (pathname === "/entries") {
-      navigate("/entries/list");
-    }
-  }, [navigate, pathname]);
-
   let id = searchParams.get("id");
   return (
     <>
