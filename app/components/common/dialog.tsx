@@ -45,7 +45,7 @@ export function Dialog({children, open, className}: DialogProps) {
   return (
     open && (
       <AnimatePresence>
-        <div className="fixed inset-0 z-50 flex h-screen w-screen items-center justify-center bg-black/50 ">
+        <div className="fixed inset-0 z-50 flex h-screen w-screen items-center justify-center bg-black/80">
           <motion.section
             initial={{opacity: 0, scale: 0.5}}
             animate={{opacity: 1, scale: 1}}
@@ -53,7 +53,7 @@ export function Dialog({children, open, className}: DialogProps) {
             transition={{duration: 0.2, stiffness: 50, type: "spring"}}
             role="dialog"
             className={cn(
-              "flex min-h-[12rem] min-w-[22rem] flex-col rounded-md border-2 border-gray-500 bg-white  text-gray-900",
+              "flex  min-w-[8rem] min-h-[12rem] sm:min-w-[22rem] flex-col rounded-md border-2 border-gray-500 bg-white  text-gray-900",
               className
             )}
           >

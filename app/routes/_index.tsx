@@ -5,7 +5,7 @@ import {PageWrapper} from "~/components/common/page_wrapper";
 const AppRoutes = Object.freeze([
   {
     title: "Entries",
-    to: "/entries/list",
+    to: "/entries",
   },
   {
     title: "About",

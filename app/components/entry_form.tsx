@@ -36,7 +36,7 @@ export function EntryForm({entry}: Props) {
       <fieldset
         disabled={isWorking}
         className={cn(
-          "flex flex-col gap-3 rounded border p-2 disabled:opacity-70",
+          "flex flex-col gap-3 rounded border border-gray-600 p-2 disabled:opacity-70",
           isWorking && "animate-pulse"
         )}
       >
@@ -64,7 +64,10 @@ export function EntryForm({entry}: Props) {
                 value: "thoughts",
               },
             ].map((option) => (
-              <div className="flex items-center gap-2" key={option.value}>
+              <label
+                className="flex cursor-pointer items-center gap-1"
+                key={option.value}
+              >
                 <input
                   type="radio"
                   name="type"
@@ -72,8 +75,8 @@ export function EntryForm({entry}: Props) {
                   defaultChecked={option.value === (entry?.type ?? "work")}
                   required
                 />
-                <label>{option.label}</label>
-              </div>
+                <span>{option.label}</span>
+              </label>
             ))}
           </FormGroup>
           <FormGroup>
