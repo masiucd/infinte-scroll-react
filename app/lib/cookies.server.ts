@@ -20,7 +20,8 @@ export async function checkForUserInCookie(cookie: {userEmail?: string}) {
   return null;
 }
 
-export async function readCookie(cookieHeader: string) {
+export async function readCookie(request: Request) {
+  let cookieHeader = request.headers.get("Cookie");
   let cookie = (await userCookie.parse(cookieHeader)) || {};
   return cookie;
 }

@@ -1,8 +1,20 @@
-import {type ActionArgs, redirect} from "@remix-run/node";
-import {Form} from "@remix-run/react";
+import {
+  type ActionArgs,
+  json,
+  type LoaderArgs,
+  redirect,
+} from "@remix-run/node";
+import {
+  Form,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
 // import {hash} from "bcrypt";
 import invariant from "tiny-invariant";
 
+import {PageWrapper} from "~/components/common/page_wrapper";
+import {readCookie} from "~/lib/cookies.server";
 import {hashPassword} from "~/lib/password.server";
 import Button from "~/ui/button";
 import {db} from "~/utils/prisma.server";
@@ -16,23 +28,15 @@ export async function action({request}: ActionArgs) {
   invariant(typeof password === "string", "password must be a string");
   invariant(typeof fullName === "string", "fullName must be a string");
 
-  // let errors: {
-  //   password?: string;
-  //   confirmPassword?: string;
-  //   fullName?: string;
-  // } = {};
-
   let user = await db.user.findUnique({where: {email}});
-  console.log("user", user);
   if (user) {
-    return redirect("/auth/register", {
-      status: 400,
-      statusText: "User already exists",
-    });
+    return json(
+      {message: "user already exists", status: 400},
+      {status: 400, statusText: "Errors"}
+    );
   }
 
   let hashedPassword = await hashPassword(password);
-
   await db.user.create({
     data: {
       email,
@@ -40,21 +44,41 @@ export async function action({request}: ActionArgs) {
       name: fullName,
     },
   });
-  return redirect("/", {
-    status: 201,
-    statusText: "User created",
-  });
+
+  return json(
+    {
+      message: "User created",
+      status: 201,
+    },
+    {status: 201, statusText: "User created"}
+  );
 }
 
 // TOOD chceck if user is already logged in
-// export async function loader() {
-//   return {message: "Register"};
-// }
+export async function loader({request}: LoaderArgs) {
+  let cookie = await readCookie(request);
+  if (cookie.user) {
+    return redirect("/", {
+      status: 302,
+      statusText: "already logged in",
+      headers: {Location: "/"},
+    });
+  }
+  return null;
+}
 
 export default function Page() {
+  let loaderData = useLoaderData<typeof loader>();
+  let actionData = useActionData<typeof action>();
+
+  let navigate = useNavigate();
+  if (actionData && actionData.status === 201) {
+    navigate("/", {replace: true});
+  }
+
   return (
-    <div>
-      <fieldset>
+    <PageWrapper>
+      <fieldset className="mx-auto w-full max-w-full sm:max-w-lg">
         <legend>Register</legend>
         <Form method="post">
           <div className="flex flex-col gap-1">
@@ -95,6 +119,6 @@ export default function Page() {
           </div>
         </Form>
       </fieldset>
-    </div>
+    </PageWrapper>
   );
 }
