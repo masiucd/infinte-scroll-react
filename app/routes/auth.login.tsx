@@ -1,9 +1,9 @@
 import {type ActionArgs, type LoaderArgs, redirect} from "@remix-run/node";
-import {Form, useActionData, useLoaderData} from "@remix-run/react";
+import {Form} from "@remix-run/react";
 import invariant from "tiny-invariant";
 
 import {PageWrapper} from "~/components/common/page_wrapper";
-import {userCookie} from "~/cookies.server";
+import {userCookie} from "~/lib/cookies.server";
 import Button from "~/ui/button";
 
 const EMAIL = "masiu@ex.com";
@@ -40,7 +40,6 @@ export async function loader({request}: LoaderArgs) {
   let cookieHeader = request.headers.get("Cookie");
   let cookie = await userCookie.parse(cookieHeader);
   // Cookie can be null if it's not set
-  console.log("cookie", cookie);
   if (cookie?.userEmail) {
     return redirect("/", {
       headers: {
