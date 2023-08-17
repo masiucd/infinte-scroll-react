@@ -5,7 +5,11 @@
     "build": "remix build",
     "dev": "remix dev",
     "start": "remix-serve build",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "routes:gen": "routes-gen -d @routes-gen/remix",
+    "db:migrations": "npx prisma migrate dev",
+    "db:push": "npx prisma db push",
+    "db:studio": "npx prisma studio"
   },
   "dependencies": {
     "@prisma/client": "^4.16.2",
@@ -29,6 +33,7 @@
   "devDependencies": {
     "@remix-run/dev": "^1.19.3",
     "@remix-run/eslint-config": "^1.19.3",
+    "@routes-gen/remix": "^0.3.6",
     "@tailwindcss/forms": "^0.5.4",
     "@tailwindcss/typography": "^0.5.9",
     "@types/react": "^18.2.20",
@@ -39,6 +44,7 @@
     "prettier": "^2.8.8",
     "prettier-plugin-tailwindcss": "^0.3.0",
     "prisma": "^4.16.2",
+    "routes-gen": "^0.6.1",
     "tailwindcss": "^3.3.3",
     "typescript": "^5.1.6"
   },

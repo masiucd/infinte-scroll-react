@@ -51,7 +51,9 @@ export default function App() {
         <Links />
       </head>
       <body className={cn("bg-gray-950 text-gray-100 font-serif")}>
-        <Outlet />
+        <main className={cn("flex flex-col min-h-screen flex-1")}>
+          <Outlet />
+        </main>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
