@@ -58,3 +58,30 @@ export async function checkIfUserIsLoggedInAndRedirect(request: Request) {
     }
   );
 }
+
+export async function logout(request: Request) {
+  let cookie = await readCookie(request);
+  if (cookie?.user) {
+    return json(
+      {loggedIn: false},
+      {
+        status: 301,
+        statusText: "logged out",
+        headers: {
+          "Set-Cookie": await userCookie.serialize({}),
+          Location: "/",
+        },
+      }
+    );
+  }
+  return json(
+    {loggedIn: false},
+    {
+      status: 200,
+      statusText: "ok",
+      headers: {
+        Location: "/",
+      },
+    }
+  );
+}

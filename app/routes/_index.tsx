@@ -40,7 +40,6 @@ export async function loader({request}: LoaderArgs) {
 
 export default function Page() {
   let loaderData = useLoaderData<typeof loader>();
-  console.log("loaderData", loaderData);
   return (
     <PageWrapper>
       <h1>My working journal</h1>
