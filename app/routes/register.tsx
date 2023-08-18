@@ -5,10 +5,14 @@ import {
   redirect,
 } from "@remix-run/node";
 import {Form, useActionData, useNavigate} from "@remix-run/react";
+import {useEffect} from "react";
 import invariant from "tiny-invariant";
 
 import {PageWrapper} from "~/components/common/page_wrapper";
-import {readCookie} from "~/lib/cookies.server";
+import {
+  checkIfUserIsLoggedInAndRedirect,
+  readCookie,
+} from "~/lib/cookies.server";
 import {hashPassword} from "~/lib/password.server";
 import Button from "~/ui/button";
 import {db} from "~/utils/prisma.server";
@@ -48,26 +52,19 @@ export async function action({request}: ActionArgs) {
   );
 }
 
-// TOOD chceck if user is already logged in
 export async function loader({request}: LoaderArgs) {
-  let cookie = await readCookie(request);
-  if (cookie.user) {
-    return redirect("/", {
-      status: 302,
-      statusText: "already logged in",
-      headers: {Location: "/"},
-    });
-  }
-  return null;
+  return await checkIfUserIsLoggedInAndRedirect(request);
 }
 
 export default function Page() {
   let actionData = useActionData<typeof action>();
-
   let navigate = useNavigate();
-  if (actionData && actionData.status === 201) {
-    navigate("/", {replace: true});
-  }
+  console.log("actionData", actionData);
+  // useEffect(() => {
+  //   if (actionData.) {
+  //     navigate("/", {replace: true});
+  //   }
+  // }, [actionData, navigate]);
 
   return (
     <PageWrapper>

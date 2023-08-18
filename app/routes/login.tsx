@@ -9,7 +9,11 @@ import {useEffect} from "react";
 import invariant from "tiny-invariant";
 
 import {PageWrapper} from "~/components/common/page_wrapper";
-import {readCookie, userCookie} from "~/lib/cookies.server";
+import {
+  checkIfUserIsLoggedInAndRedirect,
+  readCookie,
+  userCookie,
+} from "~/lib/cookies.server";
 import {verifyPassword} from "~/lib/password.server";
 import Button from "~/ui/button";
 import {db} from "~/utils/prisma.server";
@@ -34,7 +38,6 @@ export async function action({request}: ActionArgs) {
       });
     }
     cookie.user = {id: user.id, email: user.email};
-    // cookie.user = JSON.stringify({id: user.id, email: user.email});
     return redirect("/", {
       headers: {
         "Set-Cookie": await userCookie.serialize(cookie),
@@ -49,27 +52,18 @@ export async function action({request}: ActionArgs) {
 }
 
 export async function loader({request}: LoaderArgs) {
-  let cookie = await readCookie(request);
-  if (cookie?.user) {
-    return json(
-      {loggedIn: true},
-      {
-        status: 301,
-        statusText: "already logged in",
-      }
-    );
-  }
-  return json({loggedIn: false}, {status: 200, statusText: "ok"});
+  return await checkIfUserIsLoggedInAndRedirect(request);
 }
 
 export default function Page() {
-  let loaderData = useLoaderData<typeof loader>();
-  let navigate = useNavigate();
-  useEffect(() => {
-    if (loaderData?.loggedIn) {
-      navigate("/", {replace: true});
-    }
-  }, [loaderData?.loggedIn, navigate]);
+  // let loaderData = useLoaderData<typeof loader>();
+  // let navigate = useNavigate();
+  // console.log("loaderData", loaderData);
+  // useEffect(() => {
+  //   if (loaderData?.loggedIn) {
+  //     navigate("/", {replace: true});
+  //   }
+  // }, [loaderData?.loggedIn, navigate]);
   return (
     <PageWrapper className="flex-1 justify-center ">
       <fieldset className="mx-auto my-8 flex w-full max-w-md flex-col items-center justify-center rounded-md border border-gray-300 p-4 shadow-md">
