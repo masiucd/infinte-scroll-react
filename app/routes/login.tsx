@@ -1,13 +1,7 @@
-import {
-  type ActionArgs,
-  json,
-  type LoaderArgs,
-  redirect,
-} from "@remix-run/node";
-import {Form, useLoaderData, useNavigate} from "@remix-run/react";
-import {useEffect} from "react";
+import {type ActionArgs, type LoaderArgs, redirect} from "@remix-run/node";
 import invariant from "tiny-invariant";
 
+import {AuthForm} from "~/components/auth_form";
 import {PageWrapper} from "~/components/common/page_wrapper";
 import {
   checkIfUserIsLoggedInAndRedirect,
@@ -15,7 +9,6 @@ import {
   userCookie,
 } from "~/lib/cookies.server";
 import {verifyPassword} from "~/lib/password.server";
-import Button from "~/ui/button";
 import {db} from "~/utils/prisma.server";
 
 export async function action({request}: ActionArgs) {
@@ -56,46 +49,21 @@ export async function loader({request}: LoaderArgs) {
 }
 
 export default function Page() {
-  // let loaderData = useLoaderData<typeof loader>();
-  // let navigate = useNavigate();
-  // console.log("loaderData", loaderData);
-  // useEffect(() => {
-  //   if (loaderData?.loggedIn) {
-  //     navigate("/", {replace: true});
-  //   }
-  // }, [loaderData?.loggedIn, navigate]);
   return (
     <PageWrapper className="flex-1 justify-center ">
-      <fieldset className="mx-auto my-8 flex w-full max-w-md flex-col items-center justify-center rounded-md border border-gray-300 p-4 shadow-md">
-        <legend>Login</legend>
-        <Form method="post" className="flex w-full flex-col gap-2">
-          <div className="flex flex-col gap-1">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              className="rounded-sm text-gray-950"
-              required
-            />
-          </div>
-          <div className="flex flex-col gap-1">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              className="rounded-sm text-gray-950"
-              required
-            />
-          </div>
-          <div className="flex w-32 flex-col gap-1">
-            <Button variant="primary" type="submit">
-              Login
-            </Button>
-          </div>
-        </Form>
-      </fieldset>
+      <AuthForm title="Login">
+        <AuthForm.FormGroup label="email">
+          <AuthForm.Input label="email" type="email" />
+        </AuthForm.FormGroup>
+        <AuthForm.FormGroup label="password">
+          <AuthForm.Input label="password" />
+        </AuthForm.FormGroup>
+        <div className="flex w-32 flex-col gap-1">
+          <AuthForm.SubmitButton>
+            <span>Login</span>
+          </AuthForm.SubmitButton>
+        </div>
+      </AuthForm>
     </PageWrapper>
   );
 }
