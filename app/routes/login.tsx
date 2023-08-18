@@ -1,19 +1,21 @@
-import {type ActionArgs, type LoaderArgs, redirect} from "@remix-run/node";
-import {Form} from "@remix-run/react";
+import {
+  type ActionArgs,
+  json,
+  type LoaderArgs,
+  redirect,
+} from "@remix-run/node";
+import {Form, useLoaderData, useNavigate} from "@remix-run/react";
+import {useEffect} from "react";
 import invariant from "tiny-invariant";
 
 import {PageWrapper} from "~/components/common/page_wrapper";
-import {userCookie} from "~/lib/cookies.server";
+import {readCookie, userCookie} from "~/lib/cookies.server";
+import {verifyPassword} from "~/lib/password.server";
 import Button from "~/ui/button";
-
-const EMAIL = "masiu@ex.com";
-const PASSWORD = "123";
+import {db} from "~/utils/prisma.server";
 
 export async function action({request}: ActionArgs) {
-  let cookieHeader = request.headers.get("Cookie");
-  let cookie = (await userCookie.parse(cookieHeader)) || {};
-  // Cookie can be null if it's not set
-
+  let cookie = await readCookie(request);
   let formData = await request.formData();
   let email = formData.get("email");
   let password = formData.get("password");
@@ -21,8 +23,18 @@ export async function action({request}: ActionArgs) {
   invariant(typeof email === "string", "email must be a string");
   invariant(typeof password === "string", "password must be a string");
 
-  if (email === EMAIL && password === PASSWORD) {
-    cookie.userEmail = email;
+  let user = await db.user.findUnique({where: {email}});
+
+  if (user) {
+    let isValidPassword = await verifyPassword(password, user?.password);
+    if (!isValidPassword) {
+      return redirect("/login", {
+        status: 401,
+        statusText: "Unauthorized",
+      });
+    }
+    cookie.user = {id: user.id, email: user.email};
+    // cookie.user = JSON.stringify({id: user.id, email: user.email});
     return redirect("/", {
       headers: {
         "Set-Cookie": await userCookie.serialize(cookie),
@@ -37,20 +49,27 @@ export async function action({request}: ActionArgs) {
 }
 
 export async function loader({request}: LoaderArgs) {
-  let cookieHeader = request.headers.get("Cookie");
-  let cookie = await userCookie.parse(cookieHeader);
-  // Cookie can be null if it's not set
-  if (cookie?.userEmail) {
-    return redirect("/", {
-      headers: {
-        "Set-Cookie": await userCookie.serialize(cookie),
-      },
-    });
+  let cookie = await readCookie(request);
+  if (cookie?.user) {
+    return json(
+      {loggedIn: true},
+      {
+        status: 301,
+        statusText: "already logged in",
+      }
+    );
   }
-  return null;
+  return json({loggedIn: false}, {status: 200, statusText: "ok"});
 }
 
 export default function Page() {
+  let loaderData = useLoaderData<typeof loader>();
+  let navigate = useNavigate();
+  useEffect(() => {
+    if (loaderData?.loggedIn) {
+      navigate("/", {replace: true});
+    }
+  }, [loaderData?.loggedIn, navigate]);
   return (
     <PageWrapper className="flex-1 justify-center ">
       <fieldset className="mx-auto my-8 flex w-full max-w-md flex-col items-center justify-center rounded-md border border-gray-300 p-4 shadow-md">

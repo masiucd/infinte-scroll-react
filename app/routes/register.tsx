@@ -4,13 +4,7 @@ import {
   type LoaderArgs,
   redirect,
 } from "@remix-run/node";
-import {
-  Form,
-  useActionData,
-  useLoaderData,
-  useNavigate,
-} from "@remix-run/react";
-// import {hash} from "bcrypt";
+import {Form, useActionData, useNavigate} from "@remix-run/react";
 import invariant from "tiny-invariant";
 
 import {PageWrapper} from "~/components/common/page_wrapper";
@@ -68,7 +62,6 @@ export async function loader({request}: LoaderArgs) {
 }
 
 export default function Page() {
-  let loaderData = useLoaderData<typeof loader>();
   let actionData = useActionData<typeof action>();
 
   let navigate = useNavigate();

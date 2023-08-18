@@ -9,8 +9,10 @@ export let userCookie = createCookie("user", {
   secure: process.env.NODE_ENV === "production",
 });
 
-export async function checkForUserInCookie(cookie: {userEmail?: string}) {
-  if (cookie?.userEmail) {
+export async function checkForUserInCookie(cookie: {
+  user?: {id: string; email: string};
+}) {
+  if (cookie?.user) {
     return redirect("/", {
       headers: {
         "Set-Cookie": await userCookie.serialize(cookie),
