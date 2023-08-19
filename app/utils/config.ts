@@ -1,23 +1,19 @@
 export const AppRoutes = Object.freeze([
   {
-    title: "Entries",
+    title: "entries",
     to: "/entries",
   },
   {
-    title: "About",
+    title: "about",
     to: "/about",
   },
   {
-    title: "Contact",
-    to: "/contact",
-  },
-  {
-    title: "Register",
-    to: "/register",
-  },
-  {
-    title: "Login",
+    title: "login",
     to: "/login",
+  },
+  {
+    title: "logout",
+    to: "/logout",
   },
 ]);
 

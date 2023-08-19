@@ -6,6 +6,7 @@ type SessionData = {
 
 type SessionFlashData = {
   error: string;
+  success: string;
 };
 
 let {

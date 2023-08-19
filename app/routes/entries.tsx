@@ -8,7 +8,9 @@ import {
 } from "@remix-run/react";
 
 import {Dialog} from "~/components/common/dialog";
+import Link from "~/components/common/link";
 import {PageWrapper} from "~/components/common/page_wrapper";
+import {H1} from "~/components/ui/typography";
 import {Icons} from "~/lib/icons";
 import {getWJSSession} from "~/sessions";
 import Button from "~/ui/button";
@@ -26,7 +28,16 @@ export default function Page() {
   let navigate = useNavigate();
   let id = searchParams.get("id");
   if (!isAdmin) {
-    return null;
+    return (
+      <PageWrapper className="py-10">
+        <div className="flex flex-1 items-center justify-center">
+          <div className="p-2">
+            <H1>You are not authorized to view this page.</H1>
+            <Link to="/">Go back home</Link>
+          </div>
+        </div>
+      </PageWrapper>
+    );
   }
   return (
     <>

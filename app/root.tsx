@@ -1,4 +1,4 @@
-import type {LinksFunction, V2_MetaFunction} from "@remix-run/node";
+import type {LinksFunction, LoaderArgs, V2_MetaFunction} from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -6,11 +6,15 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "@remix-run/react";
 
 import stylesheet from "~/tailwind.css";
 
+import Header from "./components/layout/header";
 import {cn} from "./lib/styles";
+import {getWJSSession} from "./sessions";
+import {AppRoutes} from "./utils/config";
 
 export const links: LinksFunction = () => [
   {rel: "stylesheet", href: stylesheet},
@@ -41,7 +45,19 @@ export const meta: V2_MetaFunction = () => {
   ];
 };
 
+export async function loader({request}: LoaderArgs) {
+  let session = await getWJSSession(request.headers.get("Cookie"));
+  let admin = session.get("isAdmin");
+  if (admin) {
+    return AppRoutes.filter(({title}) => title !== "login");
+  }
+  return AppRoutes.filter(
+    ({title}) => title !== "logout" && title !== "entries"
+  );
+}
+
 export default function App() {
+  let data = useLoaderData<typeof loader>();
   return (
     <html lang="en">
       <head>
@@ -51,7 +67,7 @@ export default function App() {
         <Links />
       </head>
       <body className={cn("bg-gray-950 text-gray-100 font-serif")}>
-        {/* <Header routes={loaderData} /> */}
+        <Header routes={data} />
         <main className={cn("flex flex-col min-h-screen flex-1")}>
           <Outlet />
         </main>
