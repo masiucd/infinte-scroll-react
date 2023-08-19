@@ -23,7 +23,7 @@ export const AuthForm = ({
         className
       )}
     >
-      <legend>{title}</legend>
+      <legend className="px-1 text-xl tracking-tight">{title}</legend>
       <Form
         method="post"
         action={action}

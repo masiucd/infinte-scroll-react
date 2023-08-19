@@ -1,6 +1,6 @@
 import {type ActionArgs, type LoaderArgs, redirect} from "@remix-run/node";
-import {Form} from "@remix-run/react";
 
+import {AuthForm} from "~/components/auth_form";
 import {PageWrapper} from "~/components/common/page_wrapper";
 import {commitWJSSession, getWJSSession} from "~/sessions";
 
@@ -29,21 +29,17 @@ export async function loader({request}: LoaderArgs) {
 export default function Login() {
   return (
     <PageWrapper>
-      <Form method="post">
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          className="text-gray-950"
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          className="text-gray-950"
-        />
-        <button type="submit">Login</button>
-      </Form>
+      <AuthForm action="/login" title="Login">
+        <AuthForm.FormGroup label="email">
+          <AuthForm.Input type="email" name="email" label="email" />
+        </AuthForm.FormGroup>
+        <AuthForm.FormGroup label="password">
+          <AuthForm.Input type="password" name="password" label="password" />
+        </AuthForm.FormGroup>
+        <div className="flex justify-end pt-3">
+          <AuthForm.SubmitButton>Login</AuthForm.SubmitButton>
+        </div>
+      </AuthForm>
     </PageWrapper>
   );
 }
