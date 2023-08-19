@@ -7,12 +7,14 @@ import Button from "~/ui/button";
 type Props = {
   title: string;
   className?: string;
+  action: string;
 };
 
 export const AuthForm = ({
   title,
   className,
   children,
+  action,
 }: PropsWithChildren<Props>) => {
   return (
     <fieldset
@@ -22,7 +24,11 @@ export const AuthForm = ({
       )}
     >
       <legend>{title}</legend>
-      <Form method="post" className="flex w-full flex-col gap-2">
+      <Form
+        method="post"
+        action={action}
+        className="flex w-full flex-col gap-2"
+      >
         {children}
       </Form>
     </fieldset>

@@ -1,69 +1,49 @@
 import {type ActionArgs, type LoaderArgs, redirect} from "@remix-run/node";
-import invariant from "tiny-invariant";
+import {Form} from "@remix-run/react";
 
-import {AuthForm} from "~/components/auth_form";
 import {PageWrapper} from "~/components/common/page_wrapper";
-import {
-  checkIfUserIsLoggedInAndRedirect,
-  readCookie,
-  userCookie,
-} from "~/lib/cookies.server";
-import {verifyPassword} from "~/lib/password.server";
-import {db} from "~/utils/prisma.server";
+import {commitWJSSession, getWJSSession} from "~/sessions";
 
 export async function action({request}: ActionArgs) {
-  let cookie = await readCookie(request);
-  let formData = await request.formData();
-  let email = formData.get("email");
-  let password = formData.get("password");
-
-  invariant(typeof email === "string", "email must be a string");
-  invariant(typeof password === "string", "password must be a string");
-
-  let user = await db.user.findUnique({where: {email}});
-
-  if (user) {
-    let isValidPassword = await verifyPassword(password, user?.password);
-    if (!isValidPassword) {
-      return redirect("/login", {
-        status: 401,
-        statusText: "Unauthorized",
-      });
-    }
-    cookie.user = {id: user.id, email: user.email};
-    return redirect("/", {
-      headers: {
-        "Set-Cookie": await userCookie.serialize(cookie),
-      },
+  let form = await request.formData();
+  let {email, password} = Object.fromEntries(form.entries());
+  if (email === "ciszekmarcell@gmail.com" && password === "123456") {
+    let session = await getWJSSession();
+    session.set("isAdmin", true);
+    return new Response("", {
+      headers: {"Set-Cookie": await commitWJSSession(session)},
     });
   }
-
-  return redirect("/login", {
-    status: 401,
-    statusText: "Unauthorized",
-  });
+  return null;
 }
 
 export async function loader({request}: LoaderArgs) {
-  return await checkIfUserIsLoggedInAndRedirect(request);
+  let session = await getWJSSession(request.headers.get("Cookie"));
+  let admin = session.get("isAdmin");
+  if (admin) {
+    return redirect("/");
+  }
+  return null;
 }
 
-export default function Page() {
+export default function Login() {
   return (
-    <PageWrapper className="flex-1 justify-center ">
-      <AuthForm title="Login">
-        <AuthForm.FormGroup label="email">
-          <AuthForm.Input label="email" type="email" />
-        </AuthForm.FormGroup>
-        <AuthForm.FormGroup label="password">
-          <AuthForm.Input label="password" />
-        </AuthForm.FormGroup>
-        <div className="flex w-32 flex-col gap-1">
-          <AuthForm.SubmitButton>
-            <span>Login</span>
-          </AuthForm.SubmitButton>
-        </div>
-      </AuthForm>
+    <PageWrapper>
+      <Form method="post">
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          className="text-gray-950"
+        />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          className="text-gray-950"
+        />
+        <button type="submit">Login</button>
+      </Form>
     </PageWrapper>
   );
 }

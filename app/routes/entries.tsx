@@ -1,15 +1,33 @@
-import {Form, Outlet, useNavigate, useSearchParams} from "@remix-run/react";
+import type {LoaderArgs} from "@remix-run/node";
+import {
+  Form,
+  Outlet,
+  useLoaderData,
+  useNavigate,
+  useSearchParams,
+} from "@remix-run/react";
 
 import {Dialog} from "~/components/common/dialog";
 import {PageWrapper} from "~/components/common/page_wrapper";
 import {Icons} from "~/lib/icons";
+import {getWJSSession} from "~/sessions";
 import Button from "~/ui/button";
+
+export async function loader({request}: LoaderArgs) {
+  let session = await getWJSSession(request.headers.get("Cookie"));
+  let admin = session.get("isAdmin");
+  return {isAdmin: admin ? true : false};
+}
 
 // Layout route
 export default function Page() {
+  let {isAdmin} = useLoaderData<typeof loader>();
   let [searchParams] = useSearchParams();
   let navigate = useNavigate();
   let id = searchParams.get("id");
+  if (!isAdmin) {
+    return null;
+  }
   return (
     <>
       <PageWrapper className="py-10">
