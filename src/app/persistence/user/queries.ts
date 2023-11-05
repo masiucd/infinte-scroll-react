@@ -1,26 +1,8 @@
-import {z} from "zod";
+import "server-only";
 
 import sql from "@/db/db";
 
-let UserSchema = z.object({
-  id: z.number(),
-  name: z.string(),
-  email: z.string(),
-  password: z.string(),
-  admin: z.boolean(),
-  created_at: z.date().or(z.string()),
-});
-
-// let ReadUserSchema = z.object({
-//   id: z.number(),
-//   name: z.string(),
-//   email: z.string(),
-//   admin: z.boolean(),
-//   created_at: z.date().or(z.string()),
-// });
-
-export type User = z.infer<typeof UserSchema>;
-// export type ReadUser = z.infer<typeof ReadUserSchema>;
+import {User, UserSchema} from "./schema";
 
 export async function getUserById(id: number): Promise<User | null> {
   let rows = await sql`
@@ -57,9 +39,9 @@ export async function getUserByEmail(email: string): Promise<User | null> {
     WHERE 
         u.email = ${email}
 `;
-  let user = UserSchema.parse(rows[0]);
+  let user = rows[0];
   if (!user) {
     return null;
   }
-  return user;
+  return UserSchema.parse(user);
 }
