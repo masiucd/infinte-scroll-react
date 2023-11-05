@@ -1,22 +1,20 @@
-import tailwindForms from "@tailwindcss/forms";
-import typography from "@tailwindcss/typography";
-import type {Config} from "tailwindcss";
-import colors from "tailwindcss/colors";
-import {fontFamily} from "tailwindcss/defaultTheme";
+import type { Config } from 'tailwindcss'
 
-export default {
-  content: ["./app/**/*.{js,jsx,ts,tsx}"],
+const config: Config = {
+  content: [
+    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
   theme: {
     extend: {
-      colors: {
-        // To just have on nuance of the gray color
-        gray: colors.neutral,
-      },
-      fontFamily: {
-        sans: ["Graphik", ...fontFamily.sans],
-        serif: ["var(--font-serif)", ...fontFamily.serif],
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'gradient-conic':
+          'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
     },
   },
-  plugins: [tailwindForms, typography],
-} satisfies Config;
+  plugins: [],
+}
+export default config
