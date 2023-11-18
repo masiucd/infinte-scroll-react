@@ -1,20 +1,16 @@
 "use client";
 
 import {AnimatePresence, motion} from "framer-motion";
-import {PropsWithChildren, useState} from "react";
+import {PropsWithChildren, useEffect, useState} from "react";
 
+import {type LoginErrorResult} from "@/types/login";
+
+import {Button} from "./button";
 import {icons} from "./icons";
-
-type R = {
-  status: number;
-  body: {
-    message: string;
-  };
-};
 
 type Props = {
   // eslint-disable-next-line unused-imports/no-unused-vars
-  onSubmit: (formdata: FormData) => Promise<R>;
+  onSubmit: (formdata: FormData) => Promise<LoginErrorResult>;
 };
 
 function Message({
@@ -42,8 +38,20 @@ function Message({
 }
 
 export default function LoginForm({onSubmit}: Props) {
-  let [data, setData] = useState<R | null>(null);
-  console.log("data", data);
+  let [data, setData] = useState<LoginErrorResult | null>(null);
+  useEffect(() => {
+    let timeout: number | null = null;
+    if (data) {
+      // @ts-ignore
+      timeout = setTimeout(() => {
+        setData(null);
+      }, 4000);
+      return () => {
+        // @ts-ignore
+        clearTimeout(timeout);
+      };
+    }
+  }, [data]);
   return (
     <>
       <div className="mb-2 flex min-h-[4rem] flex-col">
@@ -59,8 +67,9 @@ export default function LoginForm({onSubmit}: Props) {
           )}
         </AnimatePresence>
       </div>
+
       <form
-        className="rounded-sm bg-gray-700/60 px-2 py-5"
+        className="rounded-md bg-gray-700/60 px-2 py-5"
         action={async (e) => {
           let res = await onSubmit(e);
           setData(res);
@@ -87,12 +96,12 @@ export default function LoginForm({onSubmit}: Props) {
               className="rounded-sm border border-gray-500/60 px-2 py-1"
             />
           </label>
-          <button
+          <Button
             type="submit"
-            className="rounded-sm border bg-primary-500 px-2 py-1"
+            // className="rounded-sm border bg-primary-500 px-2 py-1"
           >
             Login
-          </button>
+          </Button>
         </fieldset>
       </form>
     </>
