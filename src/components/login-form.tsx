@@ -83,7 +83,7 @@ export default function LoginForm({onSubmit}: Props) {
               name="email"
               id="email"
               required
-              className="rounded-sm border border-gray-500/60 px-2 py-1"
+              className="rounded-md border border-gray-500/60 px-2 py-1"
             />
           </label>
           <label htmlFor="password" className="flex flex-col gap-2 capitalize">
@@ -93,7 +93,7 @@ export default function LoginForm({onSubmit}: Props) {
               name="password"
               id="password"
               required
-              className="rounded-sm border border-gray-500/60 px-2 py-1"
+              className="rounded-md border border-gray-500/60 px-2 py-1"
             />
           </label>
           <Button

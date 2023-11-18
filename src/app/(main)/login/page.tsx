@@ -42,10 +42,8 @@ async function login(formdata: FormData) {
 
 export default function Login() {
   return (
-    <main className="flex min-h-screen items-center">
-      <div className="mx-auto w-[20rem]">
-        <LoginForm onSubmit={login} />
-      </div>
-    </main>
+    <div className="w-[20rem]">
+      <LoginForm onSubmit={login} />
+    </div>
   );
 }
