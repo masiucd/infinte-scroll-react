@@ -1,6 +1,7 @@
 "use client";
 
 import {AnimatePresence, motion} from "framer-motion";
+import Link from "next/link";
 import {PropsWithChildren, useEffect, useState} from "react";
 
 import {type LoginErrorResult} from "@/types/login";
@@ -96,12 +97,16 @@ export default function LoginForm({onSubmit}: Props) {
               className="rounded-md border border-gray-500/60 px-2 py-1"
             />
           </label>
-          <Button
-            type="submit"
-            // className="rounded-sm border bg-primary-500 px-2 py-1"
-          >
-            Login
-          </Button>
+          <div className="flex items-center justify-between">
+            <Button className="basis-28" type="submit">
+              Login
+            </Button>
+            <Link href="/forget-password">
+              <span className="text-sm text-primary-300 hover:opacity-75">
+                Forget password?
+              </span>
+            </Link>
+          </div>
         </fieldset>
       </form>
     </>
