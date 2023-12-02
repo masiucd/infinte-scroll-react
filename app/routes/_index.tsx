@@ -1,8 +1,4 @@
-import {
-  redirect,
-  type ActionFunctionArgs,
-  type MetaFunction,
-} from "@remix-run/node";
+import { type ActionFunctionArgs, type MetaFunction } from "@remix-run/node";
 import { useFetcher, useLoaderData } from "@remix-run/react";
 import { format } from "date-fns";
 import { useEffect, useRef } from "react";
@@ -70,18 +66,18 @@ export default function Index() {
         <fetcher.Form method="post">
           <fieldset
             disabled={fetcher.state === "submitting"}
-            className="disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex flex-col gap-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <div>
               <input
                 type="date"
                 name="date"
                 defaultValue={format(new Date(), "yyyy-MM-dd")}
+                className="text-gray-400"
               />
             </div>
-
-            <div className="flex gap-3 border">
-              <label htmlFor="work" className="flex items-center gap-1">
+            <div className="flex gap-3 border px-2 py-1">
+              <label htmlFor="work" className="flex items-center gap-1 text-sm">
                 <input
                   type="radio"
                   name="type"
@@ -94,7 +90,7 @@ export default function Index() {
               </label>
               <label
                 htmlFor="interesting-thing"
-                className="flex items-center gap-1"
+                className="flex items-center gap-1 text-sm"
               >
                 <input
                   type="radio"
@@ -105,7 +101,10 @@ export default function Index() {
                 />
                 <span>Interesting thing</span>
               </label>
-              <label htmlFor="learning" className="flex items-center gap-1">
+              <label
+                htmlFor="learning"
+                className="flex items-center gap-1 text-sm"
+              >
                 <input
                   type="radio"
                   name="type"
@@ -123,10 +122,11 @@ export default function Index() {
                 placeholder="What did you do today?"
                 required
                 ref={ref}
+                className="text-gray-400"
               />
             </div>
 
-            <div>
+            <div className="flex justify-end border px-2 py-1">
               <button
                 className="rounded bg-blue-600 px-2 py-1 text-white"
                 type="submit"

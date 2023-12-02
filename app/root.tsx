@@ -1,5 +1,5 @@
 // import {cssBundleHref} from "@remix-run/css-bundle";
-import type {LinksFunction} from "@remix-run/node";
+import type { LinksFunction } from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -26,7 +26,7 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="bg-gray-950 text-gray-50">
         <Outlet />
         <ScrollRestoration />
         <Scripts />
