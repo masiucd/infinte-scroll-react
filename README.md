@@ -1,13 +1,38 @@
-# My working journal
+# Welcome to Remix!
 
-## About
+- [Remix Docs](https://remix.run/docs)
 
-This is my working journal. I use it to keep track of what I'm doing and what I'm learning. I also use it to keep track of my goals and my progress towards them.
+## Development
 
-## Table of Contents
+From your terminal:
 
-- [About](#about)
-- [Table of Contents](#table-of-contents)
-- [Goals](#goals)
+```sh
+npm run dev
+```
 
-## Goals
+This starts your app in development mode, rebuilding assets on file changes.
+
+## Deployment
+
+First, build your app for production:
+
+```sh
+npm run build
+```
+
+Then run the app in production mode:
+
+```sh
+npm start
+```
+
+Now you'll need to pick a host to deploy it to.
+
+### DIY
+
+If you're familiar with deploying node applications, the built-in Remix app server is production-ready.
+
+Make sure to deploy the output of `remix build`
+
+- `build/`
+- `public/build/`
