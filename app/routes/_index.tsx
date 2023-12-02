@@ -2,7 +2,9 @@ import { type ActionFunctionArgs, type MetaFunction } from "@remix-run/node";
 import { useFetcher, useLoaderData } from "@remix-run/react";
 import { format } from "date-fns";
 import { useEffect, useRef } from "react";
-import { db } from "~/database/db";
+import { db } from "~/database/db.server";
+import { insertEntry } from "~/database/queries/entries.server";
+import { insertSchema } from "~/database/schema/entries.server";
 
 export const meta: MetaFunction = () => {
   return [
@@ -32,13 +34,8 @@ export async function action({ request }: ActionFunctionArgs) {
   }
   // TODO to test when connection is slow
   await sleep();
-  return db.entry.create({
-    data: {
-      date: new Date(date),
-      type,
-      text,
-    },
-  });
+  let newEntry = insertSchema.parse({ date: new Date(date), type, text });
+  return await insertEntry(newEntry);
 }
 
 export async function loader() {
@@ -62,6 +59,13 @@ export default function Index() {
 
   return (
     <div className="mx-auto flex min-h-[100dvh] max-w-3xl flex-col  justify-center border">
+      <article>
+        <h1>My working journal</h1>
+        <p>
+          Here where I journal my progress as a developer. I write about what I
+          did, what I learned, and what I found interesting.
+        </p>
+      </article>
       <div className="w-full max-w-lg border border-blue-600">
         <fetcher.Form method="post">
           <fieldset
