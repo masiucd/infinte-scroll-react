@@ -1,16 +1,16 @@
-import { drizzle } from "drizzle-orm/better-sqlite3";
-import Database from "better-sqlite3";
-import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
+import { PrismaClient } from "@prisma/client";
 
-const sqlite = new Database("sqlite.db");
-export const db = drizzle(sqlite);
+let prisma: PrismaClient;
+if (process.env.NODE_ENV === "production") {
+  prisma = new PrismaClient();
+} else {
+  // @ts-ignore
+  if (!global.prisma) {
+    // @ts-ignore
+    global.prisma = new PrismaClient();
+  }
+  // @ts-ignore
+  prisma = global.prisma;
+}
 
-export const entries = sqliteTable("entries", {
-  id: integer("id"),
-  type: text("type"),
-  content: text("content"),
-  createdAt: text("created_at"),
-});
-
-export type Entry = typeof entries.$inferSelect; // return type when querying
-export type NewEntry = typeof entries.$inferInsert; // input type when inserting
+export { prisma as db };

@@ -1,5 +1,5 @@
 {
-  "name": "",
+  "name": "my-working-journal",
   "private": true,
   "sideEffects": false,
   "type": "module",
@@ -10,15 +10,16 @@
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@prisma/client": "5.6.0",
     "@remix-run/css-bundle": "^2.3.1",
     "@remix-run/node": "^2.3.1",
     "@remix-run/react": "^2.3.1",
     "@remix-run/serve": "^2.3.1",
-    "better-sqlite3": "^9.2.0",
-    "drizzle-orm": "^0.29.1",
+    "date-fns": "2.16.1",
     "isbot": "^3.6.8",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@remix-run/dev": "^2.3.1",
@@ -27,11 +28,11 @@
     "@types/better-sqlite3": "^7.6.8",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
-    "drizzle-kit": "^0.20.6",
     "eslint": "^8.38.0",
     "eslint-plugin-tailwindcss": "^3.13.0",
     "prettier": "^3.1.0",
     "prettier-plugin-tailwindcss": "^0.5.7",
+    "prisma": "^5.6.0",
     "tailwindcss": "^3.3.5",
     "typescript": "^5.1.6"
   },
