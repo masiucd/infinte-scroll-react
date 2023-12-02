@@ -1,4 +1,5 @@
 import type {MetaFunction} from "@remix-run/node";
+import {db, entries} from "~/database/db";
 
 export const meta: MetaFunction = () => {
   return [
@@ -9,6 +10,13 @@ export const meta: MetaFunction = () => {
     },
   ];
 };
+
+export async function loader() {
+  let rows = await db.select().from(entries);
+  console.log("rows", rows);
+
+  return {message: "Hello World"};
+}
 
 export default function Index() {
   return (
