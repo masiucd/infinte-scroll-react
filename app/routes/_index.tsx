@@ -1,6 +1,6 @@
 import { type ActionFunctionArgs, type MetaFunction } from "@remix-run/node";
 import { useFetcher, useLoaderData } from "@remix-run/react";
-import { format } from "date-fns";
+import { format, parseISO, startOfWeek } from "date-fns";
 import { useEffect, useRef } from "react";
 import { db } from "~/database/db.server";
 import { insertEntry } from "~/database/queries/entries.server";
@@ -38,11 +38,39 @@ export async function action({ request }: ActionFunctionArgs) {
   return await insertEntry(newEntry);
 }
 
+const MONDAY = 1;
+const EntryType = Object.freeze({
+  work: "work",
+  learning: "learning",
+  interestingThing: "interesting-thing",
+});
 export async function loader() {
   let entries = await db.entry.findMany();
-  return {
-    entries,
-  };
+  let groupedEntries = entries.reduce<Record<string, typeof entries>>(
+    (acc, entry) => {
+      let start = startOfWeek(entry.date, { weekStartsOn: MONDAY });
+      let dateString = format(start, "yyyy-MM-dd");
+      acc[dateString] ||= [];
+      acc[dateString].push(entry);
+      return acc;
+    },
+    {},
+  );
+
+  return Object.keys(groupedEntries)
+    .sort((a, b) => b.localeCompare(a))
+    .map((dateString) => ({
+      dateString: dateString,
+      work: groupedEntries[dateString].filter(
+        (entry) => entry.type === EntryType.work,
+      ),
+      learning: groupedEntries[dateString].filter(
+        (entry) => entry.type === EntryType.learning,
+      ),
+      interestingThing: groupedEntries[dateString].filter(
+        (entry) => entry.type === EntryType.interestingThing,
+      ),
+    }));
 }
 
 export default function Index() {
@@ -57,103 +85,106 @@ export default function Index() {
     }
   }, [fetcher.state]);
 
+  console.log("data", data);
+
   return (
-    <div className="mx-auto flex min-h-[100dvh] max-w-3xl flex-col  justify-center border">
-      <article>
+    <div className="mx-auto flex min-h-[100dvh] max-w-3xl flex-col border">
+      <article className="my-10">
         <h1>My working journal</h1>
         <p>
           Here where I journal my progress as a developer. I write about what I
           did, what I learned, and what I found interesting.
         </p>
       </article>
-      <div className="w-full max-w-lg border border-blue-600">
-        <fetcher.Form method="post">
-          <fieldset
-            disabled={fetcher.state === "submitting"}
-            className="flex flex-col gap-2 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <div>
-              <input
-                type="date"
-                name="date"
-                defaultValue={format(new Date(), "yyyy-MM-dd")}
-                className="text-gray-400"
-              />
-            </div>
-            <div className="flex gap-3 border px-2 py-1">
-              <label htmlFor="work" className="flex items-center gap-1 text-sm">
+      <section className="flex flex-1 flex-col justify-center border">
+        <div className="w-full max-w-lg border border-blue-600">
+          <fetcher.Form method="post">
+            <fieldset
+              disabled={fetcher.state === "submitting"}
+              className="flex flex-col gap-2 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <div>
                 <input
-                  type="radio"
-                  name="type"
-                  id="work"
-                  value="work"
-                  defaultChecked
-                  required
+                  type="date"
+                  name="date"
+                  defaultValue={format(new Date(), "yyyy-MM-dd")}
+                  className="text-gray-400"
                 />
-                <span>Work</span>
-              </label>
-              <label
-                htmlFor="interesting-thing"
-                className="flex items-center gap-1 text-sm"
-              >
-                <input
-                  type="radio"
-                  name="type"
-                  id="interesting-thing"
-                  value="interesting-thing"
-                  required
-                />
-                <span>Interesting thing</span>
-              </label>
-              <label
-                htmlFor="learning"
-                className="flex items-center gap-1 text-sm"
-              >
-                <input
-                  type="radio"
-                  name="type"
-                  id="learning"
-                  value="learning"
-                  required
-                />
-                <span>Learning</span>
-              </label>
-            </div>
-
-            <div>
-              <textarea
-                name="content"
-                placeholder="What did you do today?"
-                required
-                ref={ref}
-                className="text-gray-400"
-              />
-            </div>
-
-            <div className="flex justify-end border px-2 py-1">
-              <button
-                className="rounded bg-blue-600 px-2 py-1 text-white"
-                type="submit"
-              >
-                {fetcher.state === "submitting" ? "Saving..." : "Save"}
-              </button>
-            </div>
-          </fieldset>
-        </fetcher.Form>
-      </div>
-      <ul>
-        {data.entries.map((entry) => (
-          <li key={entry.id}>
-            <div className="flex gap-2">
-              <div className="text-sm text-gray-500">
-                {format(new Date(entry.date), "dd MMM yyyy")}
               </div>
-              <div className="text-sm text-gray-500">{entry.type}</div>
-            </div>
-            <div>{entry.text}</div>
-          </li>
-        ))}
-      </ul>
+              <div className="flex gap-3 border px-2 py-1">
+                <label
+                  htmlFor="work"
+                  className="flex items-center gap-1 text-sm"
+                >
+                  <input
+                    type="radio"
+                    name="type"
+                    id="work"
+                    value="work"
+                    defaultChecked
+                    required
+                  />
+                  <span>Work</span>
+                </label>
+                <label
+                  htmlFor="interesting-thing"
+                  className="flex items-center gap-1 text-sm"
+                >
+                  <input
+                    type="radio"
+                    name="type"
+                    id="interesting-thing"
+                    value="interesting-thing"
+                    required
+                  />
+                  <span>Interesting thing</span>
+                </label>
+                <label
+                  htmlFor="learning"
+                  className="flex items-center gap-1 text-sm"
+                >
+                  <input
+                    type="radio"
+                    name="type"
+                    id="learning"
+                    value="learning"
+                    required
+                  />
+                  <span>Learning</span>
+                </label>
+              </div>
+
+              <div>
+                <textarea
+                  name="content"
+                  placeholder="What did you do today?"
+                  required
+                  ref={ref}
+                  className="text-gray-400"
+                />
+              </div>
+
+              <div className="flex justify-end border px-2 py-1">
+                <button
+                  className="rounded bg-blue-600 px-2 py-1 text-white"
+                  type="submit"
+                >
+                  {fetcher.state === "submitting" ? "Saving..." : "Save"}
+                </button>
+              </div>
+            </fieldset>
+          </fetcher.Form>
+        </div>
+        <ol>
+          {data.map((entry) => (
+            <li key={entry.dateString}>
+              <strong>
+                {format(parseISO(entry.dateString), "EEEE, MMMM do, yyyy")}
+              </strong>
+            </li>
+          ))}
+        </ol>
+      </section>
     </div>
   );
 }
