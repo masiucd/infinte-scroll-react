@@ -1,5 +1,5 @@
 import { type ActionFunctionArgs, type MetaFunction } from "@remix-run/node";
-import { useFetcher, useLoaderData } from "@remix-run/react";
+import { Link, useFetcher, useLoaderData } from "@remix-run/react";
 import { format, parseISO, startOfWeek } from "date-fns";
 import { useEffect, useRef } from "react";
 import { db } from "~/database/db.server";
@@ -183,7 +183,10 @@ export default function Index() {
                     <p className="text-gray-400">Work</p>
                     <ol className="ml-5 flex list-disc flex-col gap-1 p-0">
                       {entry.work.map((entry) => (
-                        <li key={entry.id}>{entry.text}</li>
+                        <li key={entry.id}>
+                          <span className="mr-1">{entry.text}</span>
+                          <Link to={`/entries/${entry.id}/edit`}>Edit</Link>
+                        </li>
                       ))}
                     </ol>
                   </div>
@@ -193,7 +196,10 @@ export default function Index() {
                     <p className="text-gray-400">Interesting thing</p>
                     <ol className="ml-5 flex list-disc flex-col gap-1 p-0">
                       {entry.interestingThing.map((entry) => (
-                        <li key={entry.id}>{entry.text}</li>
+                        <li key={entry.id}>
+                          <span className="mr-1">{entry.text}</span>
+                          <Link to={`/entries/${entry.id}/edit`}>Edit</Link>
+                        </li>
                       ))}
                     </ol>
                   </div>
@@ -203,7 +209,10 @@ export default function Index() {
                     <p className="text-gray-400">Learning</p>
                     <ol className="ml-5 flex list-disc flex-col gap-1 p-0">
                       {entry.learning.map((entry) => (
-                        <li key={entry.id}>{entry.text}</li>
+                        <li key={entry.id}>
+                          <span className="mr-1">{entry.text}</span>
+                          <Link to={`/entries/${entry.id}/edit`}>Edit</Link>
+                        </li>
                       ))}
                     </ol>
                   </div>

@@ -11,3 +11,9 @@ export async function insertEntry(newEntry: InsertEntryType) {
     data: newEntry,
   });
 }
+
+export async function getEntryById(id: number) {
+  return await db.entry.findUnique({
+    where: { id },
+  });
+}
