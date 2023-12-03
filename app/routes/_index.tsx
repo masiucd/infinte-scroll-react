@@ -6,17 +6,15 @@ import { db } from "~/database/db.server";
 import { insertEntry } from "~/database/queries/entries.server";
 import { insertSchema } from "~/database/schema/entries.server";
 
-export const meta: MetaFunction = () => {
-  return [
-    { title: "My working journal" },
-    {
-      name: "description",
-      content: "Here where I journal my progress as a developer",
-    },
-  ];
-};
+export const meta: MetaFunction = () => [
+  { title: "My working journal" },
+  {
+    name: "description",
+    content: "Here where I journal my progress as a developer",
+  },
+];
 
-function sleep(ms = 2000) {
+function sleep(ms = 1200) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
@@ -75,7 +73,7 @@ export async function loader() {
 
 export default function Index() {
   let fetcher = useFetcher();
-  let data = useLoaderData<typeof loader>();
+  let entries = useLoaderData<typeof loader>();
   let ref = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
@@ -84,8 +82,6 @@ export default function Index() {
       ref.current.focus();
     }
   }, [fetcher.state]);
-
-  console.log("data", data);
 
   return (
     <div className="mx-auto flex min-h-[100dvh] max-w-3xl flex-col border">
@@ -97,7 +93,7 @@ export default function Index() {
         </p>
       </article>
       <section className="flex flex-1 flex-col justify-center border">
-        <div className="w-full max-w-lg border border-blue-600">
+        <div className="mb-5 w-full max-w-lg border border-blue-600">
           <fetcher.Form method="post">
             <fieldset
               disabled={fetcher.state === "submitting"}
@@ -175,14 +171,48 @@ export default function Index() {
             </fieldset>
           </fetcher.Form>
         </div>
-        <ol>
-          {data.map((entry) => (
-            <li key={entry.dateString}>
-              <strong>
-                {format(parseISO(entry.dateString), "EEEE, MMMM do, yyyy")}
-              </strong>
-            </li>
-          ))}
+        <ol className="ml-2 flex  flex-col gap-6">
+          {entries.length > 0 ? (
+            entries.map((entry) => (
+              <li key={entry.dateString} className="flex flex-col gap-1">
+                <strong className="font-semibold capitalize tracking-tighter text-gray-100">
+                  Week of {format(parseISO(entry.dateString), "MMMM do")}
+                </strong>
+                {entry.work.length > 0 && (
+                  <div className="mb-3">
+                    <p className="text-gray-400">Work</p>
+                    <ol className="ml-5 flex list-disc flex-col gap-1 p-0">
+                      {entry.work.map((entry) => (
+                        <li key={entry.id}>{entry.text}</li>
+                      ))}
+                    </ol>
+                  </div>
+                )}
+                {entry.interestingThing.length > 0 && (
+                  <div className="mb-3">
+                    <p className="text-gray-400">Interesting thing</p>
+                    <ol className="ml-5 flex list-disc flex-col gap-1 p-0">
+                      {entry.interestingThing.map((entry) => (
+                        <li key={entry.id}>{entry.text}</li>
+                      ))}
+                    </ol>
+                  </div>
+                )}
+                {entry.learning.length > 0 && (
+                  <div className="mb-3">
+                    <p className="text-gray-400">Learning</p>
+                    <ol className="ml-5 flex list-disc flex-col gap-1 p-0">
+                      {entry.learning.map((entry) => (
+                        <li key={entry.id}>{entry.text}</li>
+                      ))}
+                    </ol>
+                  </div>
+                )}
+              </li>
+            ))
+          ) : (
+            <p className="text-center">No entries yet</p>
+          )}
         </ol>
       </section>
     </div>
