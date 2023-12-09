@@ -55,10 +55,12 @@ export async function loader() {
     {},
   );
 
+  console.log(groupedEntries);
+
   return Object.keys(groupedEntries)
     .sort((a, b) => b.localeCompare(a))
     .map((dateString) => ({
-      dateString: dateString,
+      dateString,
       work: groupedEntries[dateString].filter(
         (entry) => entry.type === EntryType.work,
       ),
@@ -183,10 +185,7 @@ export default function Index() {
                     <p className="text-gray-400">Work</p>
                     <ol className="ml-5 flex list-disc flex-col gap-1 p-0">
                       {entry.work.map((entry) => (
-                        <li key={entry.id}>
-                          <span className="mr-1">{entry.text}</span>
-                          <Link to={`/entries/${entry.id}/edit`}>Edit</Link>
-                        </li>
+                        <EntryItem key={entry.id} entry={entry} />
                       ))}
                     </ol>
                   </div>
@@ -196,10 +195,7 @@ export default function Index() {
                     <p className="text-gray-400">Interesting thing</p>
                     <ol className="ml-5 flex list-disc flex-col gap-1 p-0">
                       {entry.interestingThing.map((entry) => (
-                        <li key={entry.id}>
-                          <span className="mr-1">{entry.text}</span>
-                          <Link to={`/entries/${entry.id}/edit`}>Edit</Link>
-                        </li>
+                        <EntryItem key={entry.id} entry={entry} />
                       ))}
                     </ol>
                   </div>
@@ -209,10 +205,7 @@ export default function Index() {
                     <p className="text-gray-400">Learning</p>
                     <ol className="ml-5 flex list-disc flex-col gap-1 p-0">
                       {entry.learning.map((entry) => (
-                        <li key={entry.id}>
-                          <span className="mr-1">{entry.text}</span>
-                          <Link to={`/entries/${entry.id}/edit`}>Edit</Link>
-                        </li>
+                        <EntryItem key={entry.id} entry={entry} />
                       ))}
                     </ol>
                   </div>
@@ -225,5 +218,28 @@ export default function Index() {
         </ol>
       </section>
     </div>
+  );
+}
+type Entry = {
+  id: number;
+  text: string;
+  type: string;
+  date: Date; // add this line
+};
+type Props = {
+  entry: Entry;
+};
+
+function EntryItem({ entry }: Props) {
+  return (
+    <li className="group">
+      <span className="mr-1">{entry.text}</span>
+      <Link
+        className="opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+        to={`/entries/${entry.id}/edit`}
+      >
+        Edit
+      </Link>
+    </li>
   );
 }
