@@ -55,21 +55,28 @@ export async function loader() {
     {},
   );
 
-  console.log(groupedEntries);
-
   return Object.keys(groupedEntries)
     .sort((a, b) => b.localeCompare(a))
     .map((dateString) => ({
       dateString,
-      work: groupedEntries[dateString].filter(
-        (entry) => entry.type === EntryType.work,
-      ),
-      learning: groupedEntries[dateString].filter(
-        (entry) => entry.type === EntryType.learning,
-      ),
-      interestingThing: groupedEntries[dateString].filter(
-        (entry) => entry.type === EntryType.interestingThing,
-      ),
+      work: groupedEntries[dateString]
+        .filter((entry) => entry.type === EntryType.work)
+        .map((entry) => ({
+          ...entry,
+          date: entry.date.toISOString(),
+        })),
+      learning: groupedEntries[dateString]
+        .filter((entry) => entry.type === EntryType.learning)
+        .map((entry) => ({
+          ...entry,
+          date: entry.date.toISOString(),
+        })),
+      interestingThing: groupedEntries[dateString]
+        .filter((entry) => entry.type === EntryType.interestingThing)
+        .map((entry) => ({
+          ...entry,
+          date: entry.date.toISOString(),
+        })),
     }));
 }
 
@@ -158,13 +165,13 @@ export default function Index() {
                   placeholder="What did you do today?"
                   required
                   ref={ref}
-                  className="text-gray-400"
+                  className="w-full text-gray-500"
                 />
               </div>
 
               <div className="flex justify-end border px-2 py-1">
                 <button
-                  className="rounded bg-blue-600 px-2 py-1 text-white"
+                  className="relative rounded bg-blue-600 px-2 py-1 text-white hover:bg-blue-700 active:top-1"
                   type="submit"
                 >
                   {fetcher.state === "submitting" ? "Saving..." : "Save"}
@@ -182,7 +189,7 @@ export default function Index() {
                 </strong>
                 {entry.work.length > 0 && (
                   <div className="mb-3">
-                    <p className="text-gray-400">Work</p>
+                    <p className="text-gray-200">Work</p>
                     <ol className="ml-5 flex list-disc flex-col gap-1 p-0">
                       {entry.work.map((entry) => (
                         <EntryItem key={entry.id} entry={entry} />
@@ -192,7 +199,7 @@ export default function Index() {
                 )}
                 {entry.interestingThing.length > 0 && (
                   <div className="mb-3">
-                    <p className="text-gray-400">Interesting thing</p>
+                    <p className="text-gray-200">Interesting thing</p>
                     <ol className="ml-5 flex list-disc flex-col gap-1 p-0">
                       {entry.interestingThing.map((entry) => (
                         <EntryItem key={entry.id} entry={entry} />
@@ -202,7 +209,7 @@ export default function Index() {
                 )}
                 {entry.learning.length > 0 && (
                   <div className="mb-3">
-                    <p className="text-gray-400">Learning</p>
+                    <p className="text-gray-200">Learning</p>
                     <ol className="ml-5 flex list-disc flex-col gap-1 p-0">
                       {entry.learning.map((entry) => (
                         <EntryItem key={entry.id} entry={entry} />
@@ -220,22 +227,19 @@ export default function Index() {
     </div>
   );
 }
-type Entry = {
-  id: number;
-  text: string;
-  type: string;
-  date: Date; // add this line
-};
-type Props = {
-  entry: Entry;
-};
 
-function EntryItem({ entry }: Props) {
+type LoaderReturnType = Awaited<ReturnType<typeof loader>>[number];
+type EntryType =
+  | LoaderReturnType["interestingThing"][number]
+  | LoaderReturnType["work"][number]
+  | LoaderReturnType["learning"][number];
+
+function EntryItem({ entry }: { entry: EntryType }) {
   return (
     <li className="group">
-      <span className="mr-1">{entry.text}</span>
+      <span className="mr-2">{entry.text}</span>
       <Link
-        className="opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+        className="opacity-0 transition-opacity duration-200 hover:text-sky-300 group-hover:opacity-100 "
         to={`/entries/${entry.id}/edit`}
       >
         Edit

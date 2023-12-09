@@ -1,4 +1,4 @@
-import type {Config} from "tailwindcss";
+import type { Config } from "tailwindcss";
 import colors from "tailwindcss/colors";
 
 export default {
@@ -7,6 +7,7 @@ export default {
     extend: {
       colors: {
         gray: colors.slate,
+        primary: colors.sky,
       },
     },
   },
