@@ -63,23 +63,14 @@ export async function loader({ params }: LoaderFunctionArgs) {
 export default function EditPage() {
   let entry = useLoaderData<typeof loader>();
   return (
-    <div className="mx-auto flex min-h-[100dvh] max-w-3xl flex-col border">
-      <article className="my-10">
-        <h1>My working journal</h1>
-        <p>
-          Here where I journal my progress as a developer. I write about what I
-          did, what I learned, and what I found interesting.
-        </p>
-      </article>
-      <section className="flex flex-1 flex-col  border">
-        <div className="mb-5 w-full max-w-lg border border-blue-600">
-          <h1>Edit entry </h1>
+    <section className="flex flex-1 flex-col  border">
+      <div className="mb-5 w-full max-w-lg border border-blue-600">
+        <h1>Edit entry </h1>
 
-          <div className="my-5">
-            <EntryForm entry={entry} />
-          </div>
+        <div className="my-5">
+          <EntryForm entry={entry} />
         </div>
-      </section>
-    </div>
+      </div>
+    </section>
   );
 }
