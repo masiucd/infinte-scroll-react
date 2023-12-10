@@ -1,8 +1,8 @@
 import { type ActionFunctionArgs, type MetaFunction } from "@remix-run/node";
-import { Link, useFetcher, useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 import { format, parseISO, startOfWeek } from "date-fns";
 import type { PropsWithChildren } from "react";
-import { useEffect, useRef } from "react";
+import { EntryForm } from "~/components/entry-form";
 import { db } from "~/database/db.server";
 import { insertEntry } from "~/database/queries/entries.server";
 import { insertSchema } from "~/database/schema/entries.server";
@@ -30,6 +30,7 @@ export async function action({ request }: ActionFunctionArgs) {
   }
   // TODO to test when connection is slow
   await sleep();
+  console.log({ date, type, text, t: typeof date });
   let newEntry = insertSchema.parse({ date: new Date(date), type, text });
   return await insertEntry(newEntry);
 }
@@ -79,98 +80,14 @@ export async function loader() {
 }
 
 export default function Entries() {
-  let fetcher = useFetcher();
   let entries = useLoaderData<typeof loader>();
-  let ref = useRef<HTMLTextAreaElement | null>(null);
-
-  useEffect(() => {
-    if (ref.current && fetcher.state === "idle") {
-      ref.current.value = "";
-      ref.current.focus();
-    }
-  }, [fetcher.state]);
-
   return (
     <>
       <section className="flex flex-1 flex-col  border">
         <div className="mb-5 w-full max-w-lg border border-blue-600">
-          <fetcher.Form method="post">
-            <fieldset
-              disabled={fetcher.state === "submitting"}
-              className="flex flex-col gap-2 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <div>
-                <input
-                  type="date"
-                  name="date"
-                  defaultValue={format(new Date(), "yyyy-MM-dd")}
-                  className="text-gray-400"
-                />
-              </div>
-              <div className="flex gap-3 border px-2 py-1">
-                <label
-                  htmlFor="work"
-                  className="flex items-center gap-1 text-sm"
-                >
-                  <input
-                    type="radio"
-                    name="type"
-                    id="work"
-                    value="work"
-                    defaultChecked
-                    required
-                  />
-                  <span>Work</span>
-                </label>
-                <label
-                  htmlFor="interesting-thing"
-                  className="flex items-center gap-1 text-sm"
-                >
-                  <input
-                    type="radio"
-                    name="type"
-                    id="interesting-thing"
-                    value="interesting-thing"
-                    required
-                  />
-                  <span>Interesting thing</span>
-                </label>
-                <label
-                  htmlFor="learning"
-                  className="flex items-center gap-1 text-sm"
-                >
-                  <input
-                    type="radio"
-                    name="type"
-                    id="learning"
-                    value="learning"
-                    required
-                  />
-                  <span>Learning</span>
-                </label>
-              </div>
-
-              <div>
-                <textarea
-                  name="text"
-                  placeholder="What did you do today?"
-                  required
-                  ref={ref}
-                  className="w-full text-gray-500"
-                />
-              </div>
-
-              <div className="flex justify-end border px-2 py-1">
-                <button
-                  className="relative rounded bg-blue-600 px-2 py-1 text-white hover:bg-blue-700 active:top-1"
-                  type="submit"
-                >
-                  {fetcher.state === "submitting" ? "Saving..." : "Save"}
-                </button>
-              </div>
-            </fieldset>
-          </fetcher.Form>
+          <EntryForm />
         </div>
+
         <ol className="ml-2 flex  flex-col gap-6">
           {entries.length > 0 ? (
             entries.map((entry) => (

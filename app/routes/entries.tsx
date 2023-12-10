@@ -1,4 +1,4 @@
-import { Outlet } from "@remix-run/react";
+import { Link, Outlet } from "@remix-run/react";
 
 function EntriesPage() {
   return (
@@ -9,6 +9,10 @@ function EntriesPage() {
           Here where I journal my progress as a developer. I write about what I
           did, what I learned, and what I found interesting.
         </p>
+
+        <span className="cursor-pointer text-blue-500 hover:underline">
+          <Link to="/entries/list">Entries</Link>
+        </span>
       </article>
       <Outlet />
     </main>

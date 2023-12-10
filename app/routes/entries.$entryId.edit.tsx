@@ -43,7 +43,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     text,
   });
   await updateEntry(entry);
-  return redirect(`/`);
+  return redirect(`/entries/list`);
 }
 
 export async function loader({ params }: LoaderFunctionArgs) {
@@ -65,11 +65,7 @@ export default function EditPage() {
   return (
     <section className="flex flex-1 flex-col  border">
       <div className="mb-5 w-full max-w-lg border border-blue-600">
-        <h1>Edit entry </h1>
-
-        <div className="my-5">
-          <EntryForm entry={entry} />
-        </div>
+        <EntryForm entry={entry} />
       </div>
     </section>
   );
