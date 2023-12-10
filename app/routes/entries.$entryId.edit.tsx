@@ -4,9 +4,14 @@ import type {
   LoaderFunctionArgs,
   MetaFunction,
 } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { Form, useLoaderData } from "@remix-run/react";
+import type { FormEvent } from "react";
 import { EntryForm } from "~/components/entry-form";
-import { getEntryById, updateEntry } from "~/database/queries/entries.server";
+import {
+  deleteEntry,
+  getEntryById,
+  updateEntry,
+} from "~/database/queries/entries.server";
 import { updateSchema } from "~/database/schema/entries.server";
 import { sleep } from "~/utils/sleep";
 
@@ -23,10 +28,14 @@ export async function action({ request, params }: ActionFunctionArgs) {
     throw new Response("Not found", { status: 404 });
   }
   let formData = await request.formData();
+  let action = formData.get("_action");
+  if (action === "delete") {
+    await deleteEntry(parseInt(params.entryId, 10));
+    return redirect(`/entries/list`);
+  }
   let date = formData.get("date");
   let type = formData.get("type");
   let text = formData.get("text");
-  console.log({ date, type, text });
   if (
     typeof date !== "string" ||
     typeof type !== "string" ||
@@ -59,6 +68,11 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
   return entry;
 }
+const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  if (!confirm("Are you sure you want to delete this entry?")) {
+    e.preventDefault();
+  }
+};
 
 export default function EditPage() {
   let entry = useLoaderData<typeof loader>();
@@ -66,6 +80,18 @@ export default function EditPage() {
     <section className="flex flex-1 flex-col  border">
       <div className="mb-5 w-full max-w-lg border border-blue-600">
         <EntryForm entry={entry} />
+      </div>
+      <div>
+        <Form method="post" onSubmit={handleSubmit}>
+          <button
+            type="submit"
+            className="text-gray-500 underline"
+            name="_action"
+            value="delete"
+          >
+            Delete entry ...
+          </button>
+        </Form>
       </div>
     </section>
   );

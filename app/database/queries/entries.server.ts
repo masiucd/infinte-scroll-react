@@ -31,3 +31,9 @@ export async function updateEntry(entry: UpdateEntryType) {
     },
   });
 }
+
+export async function deleteEntry(id: number) {
+  return await db.entry.delete({
+    where: { id },
+  });
+}
