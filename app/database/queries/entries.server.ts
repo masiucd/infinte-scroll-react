@@ -1,5 +1,8 @@
 import { db } from "../db.server";
-import type { InsertEntryType } from "../schema/entries.server";
+import type {
+  InsertEntryType,
+  UpdateEntryType,
+} from "../schema/entries.server";
 
 export async function getEntries() {
   let entries = await db.entry.findMany();
@@ -15,5 +18,16 @@ export async function insertEntry(newEntry: InsertEntryType) {
 export async function getEntryById(id: number) {
   return await db.entry.findUnique({
     where: { id },
+  });
+}
+
+export async function updateEntry(entry: UpdateEntryType) {
+  return await db.entry.update({
+    where: { id: entry.id },
+    data: {
+      text: entry.text,
+      type: entry.type,
+      date: entry.date,
+    },
   });
 }

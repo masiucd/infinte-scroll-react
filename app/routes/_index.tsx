@@ -1,10 +1,12 @@
 import { type ActionFunctionArgs, type MetaFunction } from "@remix-run/node";
 import { Link, useFetcher, useLoaderData } from "@remix-run/react";
 import { format, parseISO, startOfWeek } from "date-fns";
+import type { PropsWithChildren } from "react";
 import { useEffect, useRef } from "react";
 import { db } from "~/database/db.server";
 import { insertEntry } from "~/database/queries/entries.server";
 import { insertSchema } from "~/database/schema/entries.server";
+import { sleep } from "~/utils/sleep";
 
 export const meta: MetaFunction = () => [
   { title: "My working journal" },
@@ -14,15 +16,11 @@ export const meta: MetaFunction = () => [
   },
 ];
 
-function sleep(ms = 1200) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 export async function action({ request }: ActionFunctionArgs) {
   let formData = await request.formData();
   let date = formData.get("date");
   let type = formData.get("type");
-  let text = formData.get("content");
+  let text = formData.get("text");
   if (
     typeof date !== "string" ||
     typeof type !== "string" ||
@@ -101,7 +99,7 @@ export default function Index() {
           did, what I learned, and what I found interesting.
         </p>
       </article>
-      <section className="flex flex-1 flex-col justify-center border">
+      <section className="flex flex-1 flex-col  border">
         <div className="mb-5 w-full max-w-lg border border-blue-600">
           <fetcher.Form method="post">
             <fieldset
@@ -161,7 +159,7 @@ export default function Index() {
 
               <div>
                 <textarea
-                  name="content"
+                  name="text"
                   placeholder="What did you do today?"
                   required
                   ref={ref}
@@ -183,38 +181,38 @@ export default function Index() {
         <ol className="ml-2 flex  flex-col gap-6">
           {entries.length > 0 ? (
             entries.map((entry) => (
-              <li key={entry.dateString} className="flex flex-col gap-1">
+              <li key={entry.dateString} className="flex flex-col gap-3">
                 <strong className="font-semibold capitalize tracking-tighter text-gray-100">
                   Week of {format(parseISO(entry.dateString), "MMMM do")}
                 </strong>
                 {entry.work.length > 0 && (
                   <div className="mb-3">
                     <p className="text-gray-200">Work</p>
-                    <ol className="ml-5 flex list-disc flex-col gap-1 p-0">
+                    <EntryList>
                       {entry.work.map((entry) => (
                         <EntryItem key={entry.id} entry={entry} />
                       ))}
-                    </ol>
+                    </EntryList>
                   </div>
                 )}
                 {entry.interestingThing.length > 0 && (
                   <div className="mb-3">
                     <p className="text-gray-200">Interesting thing</p>
-                    <ol className="ml-5 flex list-disc flex-col gap-1 p-0">
+                    <EntryList>
                       {entry.interestingThing.map((entry) => (
                         <EntryItem key={entry.id} entry={entry} />
                       ))}
-                    </ol>
+                    </EntryList>
                   </div>
                 )}
                 {entry.learning.length > 0 && (
                   <div className="mb-3">
                     <p className="text-gray-200">Learning</p>
-                    <ol className="ml-5 flex list-disc flex-col gap-1 p-0">
+                    <EntryList>
                       {entry.learning.map((entry) => (
                         <EntryItem key={entry.id} entry={entry} />
                       ))}
-                    </ol>
+                    </EntryList>
                   </div>
                 )}
               </li>
@@ -225,6 +223,12 @@ export default function Index() {
         </ol>
       </section>
     </div>
+  );
+}
+
+function EntryList({ children }: PropsWithChildren) {
+  return (
+    <ol className="ml-10 flex list-disc flex-col gap-1 p-0">{children}</ol>
   );
 }
 

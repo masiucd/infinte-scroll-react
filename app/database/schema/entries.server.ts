@@ -7,3 +7,12 @@ export let insertSchema = z.object({
 });
 
 export type InsertEntryType = z.infer<typeof insertSchema>;
+
+export let updateSchema = z.object({
+  id: z.number(),
+  date: z.date().optional(),
+  type: z.string().optional(),
+  text: z.string().optional(),
+});
+
+export type UpdateEntryType = z.infer<typeof updateSchema>;
