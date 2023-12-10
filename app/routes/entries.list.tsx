@@ -1,4 +1,8 @@
-import { type ActionFunctionArgs, type MetaFunction } from "@remix-run/node";
+import type {
+  LoaderFunctionArgs,
+  ActionFunctionArgs,
+  MetaFunction,
+} from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { format, parseISO, startOfWeek } from "date-fns";
 import type { PropsWithChildren } from "react";
@@ -6,6 +10,7 @@ import { EntryForm } from "~/components/entry-form";
 import { db } from "~/database/db.server";
 import { insertEntry } from "~/database/queries/entries.server";
 import { insertSchema } from "~/database/schema/entries.server";
+import { getSession } from "~/session.server";
 import { sleep } from "~/utils/sleep";
 
 export const meta: MetaFunction = () => [
@@ -30,7 +35,6 @@ export async function action({ request }: ActionFunctionArgs) {
   }
   // TODO to test when connection is slow
   await sleep();
-  console.log({ date, type, text, t: typeof date });
   let newEntry = insertSchema.parse({ date: new Date(date), type, text });
   return await insertEntry(newEntry);
 }
@@ -41,7 +45,8 @@ const EntryType = Object.freeze({
   learning: "learning",
   interestingThing: "interesting-thing",
 });
-export async function loader() {
+export async function loader({ request }: LoaderFunctionArgs) {
+  let session = await getSession(request.headers.get("Cookie"));
   let entries = await db.entry.findMany();
   let groupedEntries = entries.reduce<Record<string, typeof entries>>(
     (acc, entry) => {
@@ -54,39 +59,44 @@ export async function loader() {
     {},
   );
 
-  return Object.keys(groupedEntries)
-    .sort((a, b) => b.localeCompare(a))
-    .map((dateString) => ({
-      dateString,
-      work: groupedEntries[dateString]
-        .filter((entry) => entry.type === EntryType.work)
-        .map((entry) => ({
-          ...entry,
-          date: entry.date.toISOString(),
-        })),
-      learning: groupedEntries[dateString]
-        .filter((entry) => entry.type === EntryType.learning)
-        .map((entry) => ({
-          ...entry,
-          date: entry.date.toISOString(),
-        })),
-      interestingThing: groupedEntries[dateString]
-        .filter((entry) => entry.type === EntryType.interestingThing)
-        .map((entry) => ({
-          ...entry,
-          date: entry.date.toISOString(),
-        })),
-    }));
+  return {
+    session: session.data,
+    entries: Object.keys(groupedEntries)
+      .sort((a, b) => b.localeCompare(a))
+      .map((dateString) => ({
+        dateString,
+        work: groupedEntries[dateString]
+          .filter((entry) => entry.type === EntryType.work)
+          .map((entry) => ({
+            ...entry,
+            date: entry.date.toISOString(),
+          })),
+        learning: groupedEntries[dateString]
+          .filter((entry) => entry.type === EntryType.learning)
+          .map((entry) => ({
+            ...entry,
+            date: entry.date.toISOString(),
+          })),
+        interestingThing: groupedEntries[dateString]
+          .filter((entry) => entry.type === EntryType.interestingThing)
+          .map((entry) => ({
+            ...entry,
+            date: entry.date.toISOString(),
+          })),
+      })),
+  };
 }
 
 export default function Entries() {
-  let entries = useLoaderData<typeof loader>();
+  let { entries, session } = useLoaderData<typeof loader>();
   return (
     <>
       <section className="flex flex-1 flex-col  border">
-        <div className="mb-5 w-full max-w-lg border border-blue-600">
-          <EntryForm />
-        </div>
+        {session?.admin && (
+          <div className="mb-5 w-full max-w-lg border border-blue-600">
+            <EntryForm />
+          </div>
+        )}
 
         <ol className="ml-2 flex  flex-col gap-6">
           {entries.length > 0 ? (
@@ -142,7 +152,7 @@ function EntryList({ children }: PropsWithChildren) {
   );
 }
 
-type LoaderReturnType = Awaited<ReturnType<typeof loader>>[number];
+type LoaderReturnType = Awaited<ReturnType<typeof loader>>["entries"][number];
 type EntryType =
   | LoaderReturnType["interestingThing"][number]
   | LoaderReturnType["work"][number]
