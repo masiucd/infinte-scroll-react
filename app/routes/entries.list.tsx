@@ -60,7 +60,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   );
 
   return {
-    session: session.data,
+    loggedIn: !!session.data.admin,
     entries: Object.keys(groupedEntries)
       .sort((a, b) => b.localeCompare(a))
       .map((dateString) => ({
@@ -88,11 +88,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function Entries() {
-  let { entries, session } = useLoaderData<typeof loader>();
+  let { entries, loggedIn } = useLoaderData<typeof loader>();
   return (
     <>
       <section className="flex flex-1 flex-col  border">
-        {session?.admin && (
+        {loggedIn && (
           <div className="mb-5 w-full max-w-lg border border-blue-600">
             <EntryForm />
           </div>
@@ -110,7 +110,11 @@ export default function Entries() {
                     <p className="text-gray-200">Work</p>
                     <EntryList>
                       {entry.work.map((entry) => (
-                        <EntryItem key={entry.id} entry={entry} />
+                        <EntryItem
+                          key={entry.id}
+                          entry={entry}
+                          loggedIn={loggedIn}
+                        />
                       ))}
                     </EntryList>
                   </div>
@@ -120,7 +124,11 @@ export default function Entries() {
                     <p className="text-gray-200">Interesting thing</p>
                     <EntryList>
                       {entry.interestingThing.map((entry) => (
-                        <EntryItem key={entry.id} entry={entry} />
+                        <EntryItem
+                          key={entry.id}
+                          entry={entry}
+                          loggedIn={loggedIn}
+                        />
                       ))}
                     </EntryList>
                   </div>
@@ -130,7 +138,11 @@ export default function Entries() {
                     <p className="text-gray-200">Learning</p>
                     <EntryList>
                       {entry.learning.map((entry) => (
-                        <EntryItem key={entry.id} entry={entry} />
+                        <EntryItem
+                          key={entry.id}
+                          entry={entry}
+                          loggedIn={loggedIn}
+                        />
                       ))}
                     </EntryList>
                   </div>
@@ -158,16 +170,24 @@ type EntryType =
   | LoaderReturnType["work"][number]
   | LoaderReturnType["learning"][number];
 
-function EntryItem({ entry }: { entry: EntryType }) {
+function EntryItem({
+  entry,
+  loggedIn,
+}: {
+  entry: EntryType;
+  loggedIn: boolean;
+}) {
   return (
     <li className="group">
       <span className="mr-2">{entry.text}</span>
-      <Link
-        className="opacity-0 transition-opacity duration-200 hover:text-sky-300 group-hover:opacity-100 "
-        to={`/entries/${entry.id}/edit`}
-      >
-        Edit
-      </Link>
+      {loggedIn && (
+        <Link
+          className="opacity-0 transition-opacity duration-200 hover:text-sky-300 group-hover:opacity-100 "
+          to={`/entries/${entry.id}/edit`}
+        >
+          Edit
+        </Link>
+      )}
     </li>
   );
 }

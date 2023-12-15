@@ -13,6 +13,7 @@ import {
   updateEntry,
 } from "~/database/queries/entries.server";
 import { updateSchema } from "~/database/schema/entries.server";
+import { getSession } from "~/session.server";
 import { sleep } from "~/utils/sleep";
 
 export const meta: MetaFunction = () => [
@@ -55,10 +56,19 @@ export async function action({ request, params }: ActionFunctionArgs) {
   return redirect(`/entries/list`);
 }
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
   let { entryId } = params;
   if (typeof entryId !== "string") {
     throw new Response("Not found", { status: 404 });
+  }
+  let session = await getSession(request.headers.get("Cookie"));
+  if (!session.get("admin")) {
+    return new Response(null, {
+      status: 401,
+      headers: {
+        "WWW-Authenticate": 'Basic realm="Login"',
+      },
+    });
   }
   let id = parseInt(entryId, 10);
   let entry = await getEntryById(id);

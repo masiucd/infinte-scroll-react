@@ -10,7 +10,7 @@ export async function action({ request }: ActionFunctionArgs) {
       status: 401,
     });
   }
-  if (email === "masiu@ex.com" && password === "123456") {
+  if (email === "masiu@ex.com" && password === "123") {
     let session = await getSession();
     session.set("admin", true);
     return new Response("", {
@@ -29,7 +29,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function LoginPage() {
   let data = useLoaderData<typeof loader>();
-  console.log("data", data);
   return (
     <div className="flex min-h-[100dvh] flex-col items-center justify-center">
       {data?.admin && <div className="text-2xl">You are logged in</div>}
