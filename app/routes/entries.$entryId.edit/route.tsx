@@ -10,6 +10,7 @@ import { EntryForm } from "~/components/entry-form";
 import { deleteEntry, getEntryById } from "~/database/queries/entries.server";
 import { getSession } from "~/session.server";
 import { update } from "./entry.server";
+import { validateAdmin } from "~/utils/validate-admin.server";
 
 export const meta: MetaFunction = () => [
   { title: "My working journal - Edit entry" },
@@ -18,13 +19,6 @@ export const meta: MetaFunction = () => [
     content: "Edit entry",
   },
 ];
-
-async function validateAdmin(request: Request) {
-  let session = await getSession(request.headers.get("Cookie"));
-  if (!session.get("admin")) {
-    throw new Response("Unauthorized", { status: 401 });
-  }
-}
 
 export async function action({ request, params }: ActionFunctionArgs) {
   // Make sure the cookie and is authenticated to make any changes, preventing CSRF

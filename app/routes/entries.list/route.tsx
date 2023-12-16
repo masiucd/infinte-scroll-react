@@ -12,6 +12,7 @@ import { insertEntry } from "~/database/queries/entries.server";
 import { insertSchema } from "~/database/schema/entries.server";
 import { getSession } from "~/session.server";
 import { sleep } from "~/utils/sleep";
+import { validateAdmin } from "~/utils/validate-admin.server";
 
 export const meta: MetaFunction = () => [
   { title: "My working journal" },
@@ -22,6 +23,7 @@ export const meta: MetaFunction = () => [
 ];
 
 export async function action({ request }: ActionFunctionArgs) {
+  await validateAdmin(request);
   let formData = await request.formData();
   let date = formData.get("date");
   let type = formData.get("type");

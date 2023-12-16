@@ -3,8 +3,10 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { icons } from "~/components/icons";
 import { Form, Link, Outlet, useLoaderData } from "@remix-run/react";
 import { getSession, destroySession } from "~/session.server";
+import { validateAdmin } from "~/utils/validate-admin.server";
 
 export async function action({ request }: ActionFunctionArgs) {
+  await validateAdmin(request);
   let formData = await request.formData();
   let action = formData.get("_action");
   let session = await getSession(request.headers.get("Cookie"));
