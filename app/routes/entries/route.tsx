@@ -1,15 +1,8 @@
 import { redirect } from "@remix-run/node";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { icons } from "~/components/icons";
-import {
-  Form,
-  Link,
-  Outlet,
-  useLoaderData,
-  useLocation,
-} from "@remix-run/react";
+import { Form, Link, Outlet, useLoaderData } from "@remix-run/react";
 import { getSession, destroySession } from "~/session.server";
-import { cn } from "~/utils/cn";
 
 export async function action({ request }: ActionFunctionArgs) {
   let formData = await request.formData();
@@ -42,40 +35,43 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 function EntriesPage() {
   let { isAdmin } = useLoaderData<typeof loader>();
-  let location = useLocation();
   return (
-    <main className="mx-auto flex min-h-[100dvh] max-w-3xl flex-col border">
-      <article className="my-10 flex flex-col gap-5 px-10">
+    <main className="mx-auto flex min-h-[100dvh] max-w-3xl flex-col">
+      <article className="my-10 flex flex-col gap-1 px-10">
         <div className="flex justify-end ">
           {isAdmin ? (
-            <Form method="post" className="flex items-center gap-2">
-              <icons.LogIn size={18} />
-              <button value="logout" name="_action" type="submit">
-                Logout
+            <Form method="post">
+              <button
+                value="logout"
+                name="_action"
+                type="submit"
+                className="text-gray-100 underline hover:opacity-50"
+              >
+                <span className="flex items-center gap-2">
+                  <icons.LogIn size={18} />
+                  <span>Logout</span>
+                </span>
               </button>
             </Form>
           ) : (
-            <Link to="/login" className="flex items-center gap-2">
-              <icons.LogIn size={18} />
-              <span>Login</span>
+            <Link
+              to="/login"
+              className="text-gray-100 underline hover:opacity-50"
+            >
+              <span className="flex items-center gap-2">
+                <icons.LogIn size={18} />
+                <span>Login</span>
+              </span>
             </Link>
           )}
         </div>
-        <h1>My working journal</h1>
+        <h1 className="bg-gradient-to-t from-primary-500 to-violet-500 bg-clip-text leading-snug text-transparent">
+          My working journal
+        </h1>
         <p>
           Here where I journal my progress as a developer. I write about what I
           did, what I learned, and what I found interesting.
         </p>
-        <Link
-          to="/entries/list"
-          className={cn(
-            "text-primary-400",
-            location.pathname === "/entries/list" &&
-              "pointer-events-none opacity-50",
-          )}
-        >
-          Entries list
-        </Link>
       </article>
       <Outlet />
     </main>

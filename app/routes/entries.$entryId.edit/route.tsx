@@ -7,14 +7,9 @@ import type {
 import { Form, useLoaderData } from "@remix-run/react";
 import type { FormEvent } from "react";
 import { EntryForm } from "~/components/entry-form";
-import {
-  deleteEntry,
-  getEntryById,
-  updateEntry,
-} from "~/database/queries/entries.server";
-import { updateSchema } from "~/database/schema/entries.server";
+import { deleteEntry, getEntryById } from "~/database/queries/entries.server";
 import { getSession } from "~/session.server";
-import { sleep } from "~/utils/sleep";
+import { update } from "./entry.server";
 
 export const meta: MetaFunction = () => [
   { title: "My working journal - Edit entry" },
@@ -24,7 +19,16 @@ export const meta: MetaFunction = () => [
   },
 ];
 
+async function validateAdmin(request: Request) {
+  let session = await getSession(request.headers.get("Cookie"));
+  if (!session.get("admin")) {
+    throw new Response("Unauthorized", { status: 401 });
+  }
+}
+
 export async function action({ request, params }: ActionFunctionArgs) {
+  // Make sure the cookie and is authenticated to make any changes, preventing CSRF
+  await validateAdmin(request);
   if (typeof params.entryId !== "string") {
     throw new Response("Not found", { status: 404 });
   }
@@ -44,15 +48,11 @@ export async function action({ request, params }: ActionFunctionArgs) {
   ) {
     throw new Error("Bad request");
   }
-  // TODO to test when connection is slow
-  await sleep();
-  let entry = updateSchema.parse({
-    id: parseInt(params.entryId, 10),
-    date: new Date(date),
+  await update(params.entryId, {
+    date,
     type,
     text,
   });
-  await updateEntry(entry);
   return redirect(`/entries/list`);
 }
 
@@ -75,14 +75,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   if (!entry) {
     throw new Response("Not found", { status: 404 });
   }
-
   return entry;
 }
-const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+
+function handleSubmit(e: FormEvent<HTMLFormElement>) {
   if (!confirm("Are you sure you want to delete this entry?")) {
     e.preventDefault();
   }
-};
+}
 
 export default function EditPage() {
   let entry = useLoaderData<typeof loader>();
