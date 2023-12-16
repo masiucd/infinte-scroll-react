@@ -7,16 +7,28 @@ import { Form, Link, useActionData } from "@remix-run/react";
 import { commitSession, getSession } from "~/session.server";
 import { FormGroup, Input, Label } from "./form-parts";
 import { cn } from "~/utils/cn";
+import { findUserByEmail } from "~/database/queries/users.server";
 
 export async function action({ request }: ActionFunctionArgs) {
   let formData = await request.formData();
   let { email, password } = Object.fromEntries(formData);
-  if (typeof email !== "string" && typeof password !== "string") {
+  if (typeof email !== "string" || typeof password !== "string") {
     throw new Response("Invalid email or password", {
       status: 401,
     });
   }
-  if (email === "masiu@ex.com" && password === "123") {
+
+  let user = await findUserByEmail(email);
+  console.log("user", user);
+  if (!user) {
+    return {
+      errors: {
+        message: "Invalid email or password",
+      },
+    };
+  }
+  // TODO just for demo right now!!!!
+  if (user.email === email && user.password === password) {
     let session = await getSession();
     session.set("admin", true);
     return redirect("/entries/list", {
@@ -34,7 +46,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export async function loader({ request }: LoaderFunctionArgs) {
   let session = await getSession(request.headers.get("Cookie"));
-  console.log("session", session.get("admin"));
   if (session.get("admin")) {
     return redirect("/entries/list", {
       status: 302,
