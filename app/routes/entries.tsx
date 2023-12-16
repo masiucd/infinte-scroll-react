@@ -1,5 +1,6 @@
 import { redirect } from "@remix-run/node";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { icons } from "~/components/icons";
 import {
   Form,
   Link,
@@ -44,15 +45,22 @@ function EntriesPage() {
   let location = useLocation();
   return (
     <main className="mx-auto flex min-h-[100dvh] max-w-3xl flex-col border">
-      {isAdmin && (
-        <Form method="post">
-          <button value="logout" name="_action" type="submit">
-            Logout
-          </button>
-        </Form>
-      )}
-
       <article className="my-10 flex flex-col gap-5 px-10">
+        <div className="flex justify-end ">
+          {isAdmin ? (
+            <Form method="post" className="flex items-center gap-2">
+              <icons.LogIn size={18} />
+              <button value="logout" name="_action" type="submit">
+                Logout
+              </button>
+            </Form>
+          ) : (
+            <Link to="/login" className="flex items-center gap-2">
+              <icons.LogIn size={18} />
+              <span>Login</span>
+            </Link>
+          )}
+        </div>
         <h1>My working journal</h1>
         <p>
           Here where I journal my progress as a developer. I write about what I

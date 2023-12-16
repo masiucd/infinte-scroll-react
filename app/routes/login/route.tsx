@@ -1,4 +1,8 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import {
+  redirect,
+  type ActionFunctionArgs,
+  type LoaderFunctionArgs,
+} from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
 import { commitSession, getSession } from "~/session.server";
 
@@ -13,9 +17,11 @@ export async function action({ request }: ActionFunctionArgs) {
   if (email === "masiu@ex.com" && password === "123") {
     let session = await getSession();
     session.set("admin", true);
-    return new Response("", {
+    return redirect("/entries/list", {
+      status: 302,
       headers: {
         "Set-Cookie": await commitSession(session),
+        Location: "/entries/list",
       },
     });
   }
