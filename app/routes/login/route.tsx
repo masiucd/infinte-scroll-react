@@ -15,6 +15,7 @@ export async function action({ request }: ActionFunctionArgs) {
   if (typeof email !== "string" || typeof password !== "string") {
     throw new Response("Invalid email or password", {
       status: 401,
+      statusText: "Invalid email or password",
     });
   }
 

@@ -24,7 +24,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   // Make sure the cookie and is authenticated to make any changes, preventing CSRF
   await validateAdmin(request);
   if (typeof params.entryId !== "string") {
-    throw new Response("Not found", { status: 404 });
+    throw new Response("Not found", { status: 404, statusText: "Not found" });
   }
   let formData = await request.formData();
   let action = formData.get("_action");
@@ -53,7 +53,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 export async function loader({ request, params }: LoaderFunctionArgs) {
   let { entryId } = params;
   if (typeof entryId !== "string") {
-    throw new Response("Not found", { status: 404 });
+    throw new Response("Not found", { status: 404, statusText: "Not found" });
   }
   let session = await getSession(request.headers.get("Cookie"));
   if (!session.get("admin")) {
@@ -67,7 +67,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   let id = parseInt(entryId, 10);
   let entry = await getEntryById(id);
   if (!entry) {
-    throw new Response("Not found", { status: 404 });
+    throw new Response("Not found", {
+      status: 404,
+      statusText: "Not found",
+    });
   }
   return entry;
 }
