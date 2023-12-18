@@ -1,6 +1,11 @@
-// import {cssBundleHref} from "@remix-run/css-bundle";
-import type { LinksFunction } from "@remix-run/node";
 import {
+  redirect,
+  type LinksFunction,
+  type LoaderFunctionArgs,
+  type ActionFunctionArgs,
+} from "@remix-run/node";
+import {
+  Form,
   Link,
   Links,
   LiveReload,
@@ -9,18 +14,51 @@ import {
   Scripts,
   ScrollRestoration,
   isRouteErrorResponse,
+  useLoaderData,
   useRouteError,
 } from "@remix-run/react";
 import styles from "./tailwind.css";
+import { destroySession, getSession } from "./session.server";
+import { icons } from "./components/icons";
+import { validateAdmin } from "./utils/validate-admin.server";
 
 export const links: LinksFunction = () => [
   {
     rel: "stylesheet",
     href: styles,
   },
+  {
+    rel: "stylesheet",
+    href: "/fonts/inter.css",
+  },
 ];
 
+export async function action({ request }: ActionFunctionArgs) {
+  await validateAdmin(request);
+  let formData = await request.formData();
+  let action = formData.get("_action");
+  let session = await getSession(request.headers.get("Cookie"));
+  if (action === "logout") {
+    return redirect("/entries/list", {
+      headers: {
+        "Set-Cookie": await destroySession(session),
+      },
+    });
+  }
+  return null;
+}
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  let session = await getSession(request.headers.get("Cookie"));
+
+  return {
+    isAdmin: !!session.data.admin,
+  };
+}
+
 export default function App() {
+  let { isAdmin } = useLoaderData<typeof loader>();
+
   return (
     <html lang="en">
       <head>
@@ -36,20 +74,38 @@ export default function App() {
               to="/"
               className="transition-opacity duration-75 hover:opacity-60"
             >
-              <strong className="text-2xl tracking-tight ">
-                M<span className="text-primary-500">W</span>J
+              <strong className="text-xl uppercase tracking-tighter md:text-2xl">
+                Marcell<span className="text-gray-500">Ciszek</span>
+                <span className="text-gray-600">Druzynski</span>
               </strong>
             </Link>
-            <nav className="flex">
-              <ul className="flex flex-1 items-center justify-end gap-2 px-2">
-                <li>
-                  <Link to="/">Home</Link>
-                </li>
-                <li>
-                  <Link to="/entries/list">Entries</Link>
-                </li>
-              </ul>
-            </nav>
+            <div className="flex justify-end ">
+              {isAdmin ? (
+                <Form method="post">
+                  <button
+                    value="logout"
+                    name="_action"
+                    type="submit"
+                    className="text-gray-100 underline hover:opacity-50"
+                  >
+                    <span className="flex items-center gap-2">
+                      <icons.LogIn size={18} />
+                      <span>Logout</span>
+                    </span>
+                  </button>
+                </Form>
+              ) : (
+                <Link
+                  to="/login"
+                  className="text-gray-100 underline hover:opacity-50"
+                >
+                  <span className="flex items-center gap-2">
+                    <icons.LogIn size={18} />
+                    <span>Login</span>
+                  </span>
+                </Link>
+              )}
+            </div>
           </div>
         </header>
         <Outlet />
@@ -63,7 +119,6 @@ export default function App() {
 
 export function ErrorBoundary() {
   let error = useRouteError();
-
   return (
     <html lang="en">
       <head>
