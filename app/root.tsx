@@ -39,7 +39,7 @@ export async function action({ request }: ActionFunctionArgs) {
   let action = formData.get("_action");
   let session = await getSession(request.headers.get("Cookie"));
   if (action === "logout") {
-    return redirect("/entries/list", {
+    return redirect("/entries", {
       headers: {
         "Set-Cookie": await destroySession(session),
       },
@@ -86,10 +86,9 @@ export default function App() {
                     value="logout"
                     name="_action"
                     type="submit"
-                    className="text-gray-100 underline hover:opacity-50"
+                    className="text-gray-300 hover:opacity-50"
                   >
-                    <span className="flex items-center gap-2">
-                      <icons.LogIn size={18} />
+                    <span className="flex items-center gap-2 text-sm ">
                       <span>Logout</span>
                     </span>
                   </button>
@@ -97,10 +96,9 @@ export default function App() {
               ) : (
                 <Link
                   to="/login"
-                  className="text-gray-100 underline hover:opacity-50"
+                  className="flex  text-gray-300  hover:opacity-50"
                 >
-                  <span className="flex items-center gap-2">
-                    <icons.LogIn size={18} />
+                  <span className="flex items-center gap-2 text-sm">
                     <span>Login</span>
                   </span>
                 </Link>

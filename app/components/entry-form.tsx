@@ -40,7 +40,7 @@ export function EntryForm({ entry }: Props) {
             className="text-gray-400"
           />
         </div>
-        <div className="flex gap-3 border px-2 py-1">
+        <div className="flex gap-3  px-2 py-1">
           {[
             { label: "Work", value: "work" },
             { label: "Learning", value: "learning" },
@@ -75,9 +75,9 @@ export function EntryForm({ entry }: Props) {
           />
         </div>
 
-        <div className="flex justify-end border px-2 py-1">
+        <div className="flex justify-end  px-2 py-1">
           <button
-            className="relative rounded bg-blue-600 px-2 py-1 text-white hover:bg-blue-700 active:top-1"
+            className="relative rounded bg-primary-600 px-2 py-1 text-white hover:bg-primary-700 active:top-1"
             type="submit"
           >
             {fetcher.state !== "idle" ? "Saving..." : "Save"}

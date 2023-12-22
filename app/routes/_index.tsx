@@ -1,6 +1,7 @@
 import { type MetaFunction } from "@remix-run/node";
 import { Link } from "@remix-run/react";
 import { icons } from "~/components/icons";
+import { PageTitle } from "~/components/page-title";
 
 export const meta: MetaFunction = () => [
   { title: "My working journal" },
@@ -14,7 +15,7 @@ export default function Index() {
   return (
     <main className="mx-auto flex min-h-[100dvh] max-w-3xl flex-col ">
       <aside className="mb-5 flex flex-col gap-1 px-2">
-        <h1 className="text-4xl tracking-tighter">My working journal</h1>
+        <PageTitle />
         <Link
           className="text-gray-500 underline hover:text-primary-400"
           to="/entries/list"

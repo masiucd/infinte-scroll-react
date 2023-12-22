@@ -47,20 +47,21 @@ const EntryType = Object.freeze({
   learning: "learning",
   interestingThing: "interesting-thing",
 });
+
+async function getGroupedEntries() {
+  let entries = await db.entry.findMany();
+  return entries.reduce<Record<string, typeof entries>>((acc, entry) => {
+    let start = startOfWeek(entry.date, { weekStartsOn: MONDAY });
+    let dateString = format(start, "yyyy-MM-dd");
+    acc[dateString] ||= [];
+    acc[dateString].push(entry);
+    return acc;
+  }, {});
+}
+
 export async function loader({ request }: LoaderFunctionArgs) {
   let session = await getSession(request.headers.get("Cookie"));
-  let entries = await db.entry.findMany();
-  let groupedEntries = entries.reduce<Record<string, typeof entries>>(
-    (acc, entry) => {
-      let start = startOfWeek(entry.date, { weekStartsOn: MONDAY });
-      let dateString = format(start, "yyyy-MM-dd");
-      acc[dateString] ||= [];
-      acc[dateString].push(entry);
-      return acc;
-    },
-    {},
-  );
-
+  let groupedEntries = await getGroupedEntries();
   return {
     loggedIn: !!session.data.admin,
     entries: Object.keys(groupedEntries)
@@ -93,9 +94,9 @@ export default function Entries() {
   let { entries, loggedIn } = useLoaderData<typeof loader>();
   return (
     <>
-      <section className="flex flex-1 flex-col  border">
+      <section className="flex flex-1 flex-col ">
         {loggedIn && (
-          <div className="mb-5 w-full max-w-lg border border-blue-600">
+          <div className="mb-5 w-full max-w-lg bg-gray-900 p-1">
             <EntryForm />
           </div>
         )}
@@ -104,12 +105,11 @@ export default function Entries() {
           {entries.length > 0 ? (
             entries.map((entry) => (
               <li key={entry.dateString} className="flex flex-col gap-3">
-                <strong className="font-semibold capitalize tracking-tighter text-gray-100">
+                <strong className="font-semibold capitalize tracking-tighter text-gray-50">
                   Week of {format(parseISO(entry.dateString), "MMMM do")}
                 </strong>
                 {entry.work.length > 0 && (
-                  <div className="mb-3">
-                    <p className="text-gray-200">Work</p>
+                  <EntryWrapper title="Work">
                     <EntryList>
                       {entry.work.map((entry) => (
                         <EntryItem
@@ -119,11 +119,10 @@ export default function Entries() {
                         />
                       ))}
                     </EntryList>
-                  </div>
+                  </EntryWrapper>
                 )}
                 {entry.interestingThing.length > 0 && (
-                  <div className="mb-3">
-                    <p className="text-gray-200">Interesting thing</p>
+                  <EntryWrapper title="Interesting thing">
                     <EntryList>
                       {entry.interestingThing.map((entry) => (
                         <EntryItem
@@ -133,11 +132,10 @@ export default function Entries() {
                         />
                       ))}
                     </EntryList>
-                  </div>
+                  </EntryWrapper>
                 )}
                 {entry.learning.length > 0 && (
-                  <div className="mb-3">
-                    <p className="text-gray-200">Learning</p>
+                  <EntryWrapper title="Learning">
                     <EntryList>
                       {entry.learning.map((entry) => (
                         <EntryItem
@@ -147,7 +145,7 @@ export default function Entries() {
                         />
                       ))}
                     </EntryList>
-                  </div>
+                  </EntryWrapper>
                 )}
               </li>
             ))
@@ -157,6 +155,18 @@ export default function Entries() {
         </ol>
       </section>
     </>
+  );
+}
+
+function EntryWrapper({
+  children,
+  title,
+}: PropsWithChildren<{ title: string }>) {
+  return (
+    <div className="mb-3">
+      <p className="text-gray-300">{title}</p>
+      {children}
+    </div>
   );
 }
 
@@ -181,7 +191,7 @@ function EntryItem({
 }) {
   return (
     <li className="group">
-      <span className="mr-2">{entry.text}</span>
+      <span className="mr-2 text-gray-300">{entry.text}</span>
       {loggedIn && (
         <Link
           className="opacity-0 transition-opacity duration-200 hover:text-sky-300 group-hover:opacity-100 "
