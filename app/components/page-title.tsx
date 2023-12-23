@@ -14,10 +14,10 @@ export function TitleWithWrapper({
         className,
       )}
     >
-      <h1 className="text-5xl font-bold leading-snug tracking-tight sm:text-6xl">
+      <h1 className="text-5xl font-semibold leading-snug tracking-tighter sm:text-6xl">
         Work Journal
       </h1>
-      <p className="text-gray-500">
+      <p className="tracking-tight text-gray-500">
         Doing and learnings in the world of software development
       </p>
       {children}

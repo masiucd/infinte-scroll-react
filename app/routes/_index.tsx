@@ -21,7 +21,7 @@ export default function Index() {
           View work log
         </Link>
       </TitleWithWrapper>
-      <section className="relative mx-auto flex w-full max-w-80 flex-1 flex-col sm:max-w-full">
+      <section className="relative mx-auto flex w-full max-w-80 flex-1 flex-col sm:max-w-xl">
         <strong className="absolute right-2 text-4xl text-gray-300/45">
           Learnings
         </strong>

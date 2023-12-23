@@ -4,15 +4,15 @@ import type {
   MetaFunction,
 } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
-import { format, parseISO, startOfWeek } from "date-fns";
+import { format, parseISO } from "date-fns";
 import type { PropsWithChildren } from "react";
 import { EntryForm } from "~/components/entry-form";
-import { db } from "~/database/db.server";
 import { insertEntry } from "~/database/queries/entries.server";
 import { insertSchema } from "~/database/schema/entries.server";
 import { getSession } from "~/session.server";
 import { sleep } from "~/utils/sleep";
 import { validateAdmin } from "~/utils/validate-admin.server";
+import { getGroupedEntries } from "./entries.server";
 
 export const meta: MetaFunction = () => [
   { title: "My working journal" },
@@ -41,23 +41,11 @@ export async function action({ request }: ActionFunctionArgs) {
   return await insertEntry(newEntry);
 }
 
-const MONDAY = 1;
 const EntryType = Object.freeze({
   work: "work",
   learning: "learning",
   interestingThing: "interesting-thing",
 });
-
-async function getGroupedEntries() {
-  let entries = await db.entry.findMany();
-  return entries.reduce<Record<string, typeof entries>>((acc, entry) => {
-    let start = startOfWeek(entry.date, { weekStartsOn: MONDAY });
-    let dateString = format(start, "yyyy-MM-dd");
-    acc[dateString] ||= [];
-    acc[dateString].push(entry);
-    return acc;
-  }, {});
-}
 
 export async function loader({ request }: LoaderFunctionArgs) {
   let session = await getSession(request.headers.get("Cookie"));
@@ -90,7 +78,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   };
 }
 
-export default function Entries() {
+export default function EntriesListPage() {
   let { entries, loggedIn } = useLoaderData<typeof loader>();
   return (
     <>
@@ -100,53 +88,28 @@ export default function Entries() {
             <EntryForm />
           </div>
         )}
-
         <ol className="ml-2 flex  flex-col gap-6">
           {entries.length > 0 ? (
             entries.map((entry) => (
               <li key={entry.dateString} className="flex flex-col gap-3">
-                <strong className="font-semibold capitalize tracking-tighter text-gray-50">
-                  Week of {format(parseISO(entry.dateString), "MMMM do")}
+                <strong className="text-xs font-semibold uppercase tracking-wide text-primary-400">
+                  {format(parseISO(entry.dateString), "MMMM do, yyyy")}
                 </strong>
-                {entry.work.length > 0 && (
-                  <EntryWrapper title="Work">
-                    <EntryList>
-                      {entry.work.map((entry) => (
-                        <EntryItem
-                          key={entry.id}
-                          entry={entry}
-                          loggedIn={loggedIn}
-                        />
-                      ))}
-                    </EntryList>
-                  </EntryWrapper>
-                )}
-                {entry.interestingThing.length > 0 && (
-                  <EntryWrapper title="Interesting thing">
-                    <EntryList>
-                      {entry.interestingThing.map((entry) => (
-                        <EntryItem
-                          key={entry.id}
-                          entry={entry}
-                          loggedIn={loggedIn}
-                        />
-                      ))}
-                    </EntryList>
-                  </EntryWrapper>
-                )}
-                {entry.learning.length > 0 && (
-                  <EntryWrapper title="Learning">
-                    <EntryList>
-                      {entry.learning.map((entry) => (
-                        <EntryItem
-                          key={entry.id}
-                          entry={entry}
-                          loggedIn={loggedIn}
-                        />
-                      ))}
-                    </EntryList>
-                  </EntryWrapper>
-                )}
+                <Entries
+                  entries={entry.work}
+                  title="Work"
+                  loggedIn={loggedIn}
+                />
+                <Entries
+                  entries={entry.interestingThing}
+                  title="Interesting thing"
+                  loggedIn={loggedIn}
+                />
+                <Entries
+                  entries={entry.learning}
+                  title="Learning"
+                  loggedIn={loggedIn}
+                />
               </li>
             ))
           ) : (
@@ -158,13 +121,41 @@ export default function Entries() {
   );
 }
 
+type LoaderReturnType = Awaited<ReturnType<typeof loader>>["entries"][number];
+type EntryType =
+  | LoaderReturnType["interestingThing"][number]
+  | LoaderReturnType["work"][number]
+  | LoaderReturnType["learning"][number];
+
+function Entries({
+  entries,
+  title,
+  loggedIn,
+}: {
+  entries: EntryType[];
+  title: string;
+  loggedIn: boolean;
+}) {
+  return (
+    entries.length > 0 && (
+      <EntryWrapper title={title}>
+        <EntryList>
+          {entries.map((entry) => (
+            <EntryItem key={entry.id} entry={entry} loggedIn={loggedIn} />
+          ))}
+        </EntryList>
+      </EntryWrapper>
+    )
+  );
+}
+
 function EntryWrapper({
   children,
   title,
 }: PropsWithChildren<{ title: string }>) {
   return (
     <div className="mb-3">
-      <p className="text-gray-300">{title}</p>
+      <p className="font-semibold text-gray-100">{title}</p>
       {children}
     </div>
   );
@@ -176,12 +167,6 @@ function EntryList({ children }: PropsWithChildren) {
   );
 }
 
-type LoaderReturnType = Awaited<ReturnType<typeof loader>>["entries"][number];
-type EntryType =
-  | LoaderReturnType["interestingThing"][number]
-  | LoaderReturnType["work"][number]
-  | LoaderReturnType["learning"][number];
-
 function EntryItem({
   entry,
   loggedIn,
@@ -191,7 +176,7 @@ function EntryItem({
 }) {
   return (
     <li className="group">
-      <span className="mr-2 text-gray-300">{entry.text}</span>
+      <span className="mr-2 text-gray-400">{entry.text}</span>
       {loggedIn && (
         <Link
           className="opacity-0 transition-opacity duration-200 hover:text-sky-300 group-hover:opacity-100 "

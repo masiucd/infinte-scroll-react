@@ -73,19 +73,19 @@ export default function App() {
               to="/"
               className="transition-opacity duration-75 hover:opacity-60"
             >
-              <strong className="text-xl uppercase tracking-tighter md:text-2xl">
-                Marcell<span className="text-gray-500">Ciszek</span>
-                <span className="text-gray-600">Druzynski</span>
+              <strong className="text-sm uppercase tracking-tight text-gray-200">
+                Marcell<span className="text-gray-400">Ciszek</span>
+                <span className="text-gray-500">Druzynski</span>
               </strong>
             </Link>
-            <div className="flex justify-end ">
+            <div className="flex justify-end  text-gray-500">
               {isAdmin ? (
                 <Form method="post">
                   <button
                     value="logout"
                     name="_action"
                     type="submit"
-                    className="text-gray-300 hover:opacity-50"
+                    className="hover:opacity-50"
                   >
                     <span className="flex items-center gap-2 text-sm ">
                       <span>Logout</span>
@@ -93,12 +93,9 @@ export default function App() {
                   </button>
                 </Form>
               ) : (
-                <Link
-                  to="/login"
-                  className="flex  text-gray-300  hover:opacity-50"
-                >
+                <Link to="/login" className="flex hover:opacity-50">
                   <span className="flex items-center gap-2 text-sm">
-                    <span>Login</span>
+                    <span>Log in</span>
                   </span>
                 </Link>
               )}
