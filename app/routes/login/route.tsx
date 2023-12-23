@@ -64,11 +64,13 @@ export default function LoginPage() {
 
   return (
     <main className="flex min-h-[100dvh] flex-col items-center">
-      <div className="mx-auto flex w-full max-w-md flex-1 flex-col  justify-center">
-        <h1 className="mb-2 underline decoration-primary-500">Welcome back!</h1>
+      <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center">
+        <h1 className="mb-5 pl-2 text-gray-400 underline decoration-primary-500/70">
+          Welcome back!
+        </h1>
         <Form
           method="post"
-          className="flex w-full flex-col  gap-5 rounded-md bg-gray-50 p-5"
+          className="flex w-full flex-col gap-5 rounded-md bg-gray-900 p-5"
         >
           <FormGroup>
             <Input
@@ -92,7 +94,7 @@ export default function LoginPage() {
           </FormGroup>
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
-              <small className="text-gray-950">
+              <small className="text-gray-400">
                 Forget password?{" "}
                 <Link to="/reset-password" className="text-primary-500">
                   Reset
@@ -103,7 +105,7 @@ export default function LoginPage() {
               )}
             </div>
             <button
-              className="rounded-md border border-gray-300 bg-gray-800 p-2 text-gray-100 transition-opacity duration-100 hover:opacity-50"
+              className="rounded-md border border-gray-300 bg-gray-800 p-2  text-gray-100 ring-primary-400 transition-opacity duration-100 hover:opacity-50 focus:outline-none focus:ring focus:ring-offset-2"
               type="submit"
             >
               Sign in

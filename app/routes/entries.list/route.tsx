@@ -52,29 +52,27 @@ export async function loader({ request }: LoaderFunctionArgs) {
   let groupedEntries = await getGroupedEntries();
   return {
     loggedIn: !!session.data.admin,
-    entries: Object.keys(groupedEntries)
-      .sort((a, b) => b.localeCompare(a))
-      .map((dateString) => ({
-        dateString,
-        work: groupedEntries[dateString]
-          .filter((entry) => entry.type === EntryType.work)
-          .map((entry) => ({
-            ...entry,
-            date: entry.date.toISOString(),
-          })),
-        learning: groupedEntries[dateString]
-          .filter((entry) => entry.type === EntryType.learning)
-          .map((entry) => ({
-            ...entry,
-            date: entry.date.toISOString(),
-          })),
-        interestingThing: groupedEntries[dateString]
-          .filter((entry) => entry.type === EntryType.interestingThing)
-          .map((entry) => ({
-            ...entry,
-            date: entry.date.toISOString(),
-          })),
-      })),
+    entries: Object.keys(groupedEntries).map((dateString) => ({
+      dateString,
+      work: groupedEntries[dateString]
+        .filter((entry) => entry.type === EntryType.work)
+        .map((entry) => ({
+          ...entry,
+          date: entry.date.toISOString(),
+        })),
+      learning: groupedEntries[dateString]
+        .filter((entry) => entry.type === EntryType.learning)
+        .map((entry) => ({
+          ...entry,
+          date: entry.date.toISOString(),
+        })),
+      interestingThing: groupedEntries[dateString]
+        .filter((entry) => entry.type === EntryType.interestingThing)
+        .map((entry) => ({
+          ...entry,
+          date: entry.date.toISOString(),
+        })),
+    })),
   };
 }
 
@@ -82,9 +80,12 @@ export default function EntriesListPage() {
   let { entries, loggedIn } = useLoaderData<typeof loader>();
   return (
     <>
-      <section className="flex flex-1 flex-col ">
+      <section className="mx-auto flex max-w-xl flex-1 flex-col">
         {loggedIn && (
-          <div className="mb-5 w-full max-w-lg bg-gray-900 p-1">
+          <div className="mx-1 mb-5 rounded-lg bg-gray-900  p-2 sm:mx-0">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">
+              New entry
+            </p>
             <EntryForm />
           </div>
         )}
@@ -163,11 +164,11 @@ function EntryList({ children }: PropsWithChildren) {
 function EntryItem({ entry }: { entry: EntryType }) {
   let { loggedIn } = useLoaderData<typeof loader>();
   return (
-    <li className="group leading-8 ">
+    <li className="group mb-5 flex items-center leading-8">
       <p className="mr-2 text-gray-400">{entry.text}</p>
       {loggedIn && (
         <Link
-          className="opacity-0 transition-opacity duration-200 hover:text-sky-300 group-hover:opacity-100 "
+          className="opacity-0 transition-opacity duration-200 hover:text-primary-300 group-hover:opacity-100 "
           to={`/entries/${entry.id}/edit`}
         >
           Edit

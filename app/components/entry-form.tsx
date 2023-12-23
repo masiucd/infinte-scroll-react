@@ -37,7 +37,8 @@ export function EntryForm({ entry }: Props) {
               entry?.date ? parseISO(entry.date) : new Date(),
               "yyyy-MM-dd",
             )}
-            className="text-gray-400"
+            className="w-full rounded-md border-gray-700 bg-gray-800 text-gray-400 focus:border-primary-600 focus:ring-primary-600"
+            style={{ colorScheme: "dark" }}
           />
         </div>
         <div className="flex gap-3  px-2 py-1">
@@ -48,7 +49,7 @@ export function EntryForm({ entry }: Props) {
           ].map(({ label, value }) => (
             <label
               htmlFor={value}
-              className="flex items-center gap-1 text-sm"
+              className="flex items-center gap-1 text-xs tracking-wide"
               key={value}
             >
               <input
@@ -58,6 +59,7 @@ export function EntryForm({ entry }: Props) {
                 value={value}
                 defaultChecked={value === (entry?.type ?? "work")}
                 required
+                className="mr-2 border-gray-700 bg-gray-800 text-primary-600  focus:ring-primary-600 focus:ring-offset-gray-900"
               />
               <span>{label}</span>
             </label>
@@ -70,14 +72,14 @@ export function EntryForm({ entry }: Props) {
             placeholder="What did you do today?"
             required
             ref={ref}
-            className="w-full text-gray-500"
             defaultValue={entry?.text}
+            className="w-full rounded-md border-gray-700 bg-gray-800 text-white focus:border-primary-600 focus:ring-primary-600"
           />
         </div>
 
         <div className="flex justify-end  px-2 py-1">
           <button
-            className="relative rounded bg-primary-600 px-2 py-1 text-white hover:bg-primary-700 active:top-1"
+            className="relative w-full cursor-pointer rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-primary-600 focus:ring-offset-2 focus:ring-offset-gray-900 active:top-1"
             type="submit"
           >
             {fetcher.state !== "idle" ? "Saving..." : "Save"}

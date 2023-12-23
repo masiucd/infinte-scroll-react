@@ -30,7 +30,7 @@ export function Input({
       id={id}
       placeholder={placeholder}
       className={cn(
-        "peer h-10 w-full border-0 border-b-2 border-gray-300 bg-gray-50 text-gray-700 placeholder:text-transparent focus:border-primary-500  focus:outline-none focus:ring-0",
+        "peer h-10 w-full border-0  border-b-2 border-gray-300 bg-transparent text-gray-100 placeholder:text-transparent focus:border-primary-500 focus:outline-none  focus:ring-0 ",
         className,
       )}
     />
