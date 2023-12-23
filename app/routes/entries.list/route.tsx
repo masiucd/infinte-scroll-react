@@ -88,28 +88,23 @@ export default function EntriesListPage() {
             <EntryForm />
           </div>
         )}
-        <ol className="ml-2 flex  flex-col gap-6">
+        <ol className="mx-2 flex flex-col gap-6 border-l-2 border-primary-400/15 pl-5">
           {entries.length > 0 ? (
             entries.map((entry) => (
-              <li key={entry.dateString} className="flex flex-col gap-3">
-                <strong className="text-xs font-semibold uppercase tracking-wide text-primary-400">
+              <li
+                key={entry.dateString}
+                className="relative flex flex-col gap-3"
+              >
+                <div className="absolute left-[-27px] top-0 h-3 w-3 rounded-full border border-primary-400 bg-gray-900" />
+                <strong className="mb-2 text-xs font-semibold uppercase tracking-wide text-primary-400">
                   {format(parseISO(entry.dateString), "MMMM do, yyyy")}
                 </strong>
-                <Entries
-                  entries={entry.work}
-                  title="Work"
-                  loggedIn={loggedIn}
-                />
+                <Entries entries={entry.work} title="Work" />
                 <Entries
                   entries={entry.interestingThing}
                   title="Interesting thing"
-                  loggedIn={loggedIn}
                 />
-                <Entries
-                  entries={entry.learning}
-                  title="Learning"
-                  loggedIn={loggedIn}
-                />
+                <Entries entries={entry.learning} title="Learning" />
               </li>
             ))
           ) : (
@@ -127,21 +122,13 @@ type EntryType =
   | LoaderReturnType["work"][number]
   | LoaderReturnType["learning"][number];
 
-function Entries({
-  entries,
-  title,
-  loggedIn,
-}: {
-  entries: EntryType[];
-  title: string;
-  loggedIn: boolean;
-}) {
+function Entries({ entries, title }: { entries: EntryType[]; title: string }) {
   return (
     entries.length > 0 && (
       <EntryWrapper title={title}>
         <EntryList>
           {entries.map((entry) => (
-            <EntryItem key={entry.id} entry={entry} loggedIn={loggedIn} />
+            <EntryItem key={entry.id} entry={entry} />
           ))}
         </EntryList>
       </EntryWrapper>
@@ -155,28 +142,21 @@ function EntryWrapper({
 }: PropsWithChildren<{ title: string }>) {
   return (
     <div className="mb-3">
-      <p className="font-semibold text-gray-100">{title}</p>
+      <p className="mb-2 font-semibold text-gray-100">{title}</p>
       {children}
     </div>
   );
 }
 
 function EntryList({ children }: PropsWithChildren) {
-  return (
-    <ol className="ml-10 flex list-disc flex-col gap-1 p-0">{children}</ol>
-  );
+  return <ol className="flex flex-col gap-1 p-0">{children}</ol>;
 }
 
-function EntryItem({
-  entry,
-  loggedIn,
-}: {
-  entry: EntryType;
-  loggedIn: boolean;
-}) {
+function EntryItem({ entry }: { entry: EntryType }) {
+  let { loggedIn } = useLoaderData<typeof loader>();
   return (
-    <li className="group">
-      <span className="mr-2 text-gray-400">{entry.text}</span>
+    <li className="group leading-8 ">
+      <p className="mr-2 text-gray-400">{entry.text}</p>
       {loggedIn && (
         <Link
           className="opacity-0 transition-opacity duration-200 hover:text-sky-300 group-hover:opacity-100 "
