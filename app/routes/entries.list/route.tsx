@@ -95,8 +95,8 @@ export default function EntriesListPage() {
                 key={entry.dateString}
                 className="relative flex flex-col gap-3"
               >
-                <div className="absolute left-[-27px] top-0 h-3 w-3 rounded-full border border-primary-400 bg-gray-900" />
-                <strong className="mb-2 text-xs font-semibold uppercase tracking-wide text-primary-400">
+                <Circle />
+                <strong className="mb-2 pt-[2.5px] text-xs font-semibold uppercase tracking-wide text-primary-400">
                   {format(parseISO(entry.dateString), "MMMM do, yyyy")}
                 </strong>
                 <Entries entries={entry.work} title="Work" />
@@ -113,6 +113,14 @@ export default function EntriesListPage() {
         </ol>
       </section>
     </>
+  );
+}
+
+function Circle() {
+  return (
+    <div className="absolute left-[-27px] top-0 bg-gray-950 py-1 ">
+      <div className="h-3 w-3 rounded-full border border-primary-400 bg-gray-900" />
+    </div>
   );
 }
 
