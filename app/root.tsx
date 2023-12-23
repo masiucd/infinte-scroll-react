@@ -19,7 +19,6 @@ import {
 } from "@remix-run/react";
 import styles from "./tailwind.css";
 import { destroySession, getSession } from "./session.server";
-import { icons } from "./components/icons";
 import { validateAdmin } from "./utils/validate-admin.server";
 
 export const links: LinksFunction = () => [
