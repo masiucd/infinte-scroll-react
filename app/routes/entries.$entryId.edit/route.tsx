@@ -2,6 +2,7 @@ import { redirect } from "@remix-run/node";
 import type {
   ActionFunctionArgs,
   LoaderFunctionArgs,
+  MetaArgs,
   MetaFunction,
 } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
@@ -11,12 +12,14 @@ import { deleteEntry, getEntryById } from "~/database/queries/entries.server";
 import { getSession } from "~/session.server";
 import { update } from "./entry.server";
 import { validateAdmin } from "~/utils/validate-admin.server";
+import { EntryFormWrapper } from "~/components/entry-form-wrapper";
+import { RouteWrapper } from "~/components/route-wrapper";
 
-export const meta: MetaFunction = () => [
+export const meta: MetaFunction = ({ params }: MetaArgs) => [
   { title: "My working journal - Edit entry" },
   {
     name: "description",
-    content: "Edit entry",
+    content: `Edit entry - ${params.entryId}`,
   },
 ];
 
@@ -81,14 +84,17 @@ function handleSubmit(e: FormEvent<HTMLFormElement>) {
   }
 }
 
-export default function EditPage() {
+export default function EditEntryPage() {
   let entry = useLoaderData<typeof loader>();
   return (
-    <section className="flex flex-1 flex-col  border">
-      <div className="mb-5 w-full max-w-lg border border-blue-600">
+    <RouteWrapper className="w-full">
+      <EntryFormWrapper>
+        <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">
+          Edit entry
+        </p>
         <EntryForm entry={entry} />
-      </div>
-      <div>
+      </EntryFormWrapper>
+      <div className="px-2 sm:px-0">
         <Form method="post" onSubmit={handleSubmit}>
           <button
             type="submit"
@@ -100,6 +106,6 @@ export default function EditPage() {
           </button>
         </Form>
       </div>
-    </section>
+    </RouteWrapper>
   );
 }

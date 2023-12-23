@@ -73,7 +73,7 @@ export function EntryForm({ entry }: Props) {
             required
             ref={ref}
             defaultValue={entry?.text}
-            className="w-full rounded-md border-gray-700 bg-gray-800 text-white focus:border-primary-600 focus:ring-primary-600"
+            className="min-h-32 w-full rounded-md border-gray-700 bg-gray-800 text-white focus:border-primary-600 focus:ring-primary-600"
           />
         </div>
 

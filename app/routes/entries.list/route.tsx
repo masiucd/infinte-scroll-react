@@ -13,6 +13,8 @@ import { getSession } from "~/session.server";
 import { sleep } from "~/utils/sleep";
 import { validateAdmin } from "~/utils/validate-admin.server";
 import { getGroupedEntries } from "./entries.server";
+import { EntryFormWrapper } from "~/components/entry-form-wrapper";
+import { RouteWrapper } from "~/components/route-wrapper";
 
 export const meta: MetaFunction = () => [
   { title: "My working journal" },
@@ -79,41 +81,36 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export default function EntriesListPage() {
   let { entries, loggedIn } = useLoaderData<typeof loader>();
   return (
-    <>
-      <section className="mx-auto flex max-w-xl flex-1 flex-col">
-        {loggedIn && (
-          <div className="mx-1 mb-5 rounded-lg bg-gray-900  p-2 sm:mx-0">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">
-              New entry
-            </p>
-            <EntryForm />
-          </div>
+    <RouteWrapper>
+      {loggedIn && (
+        <EntryFormWrapper>
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">
+            New entry
+          </p>
+          <EntryForm />
+        </EntryFormWrapper>
+      )}
+      <ol className="mx-2 flex flex-col gap-6 border-l-2 border-primary-400/15 pl-5">
+        {entries.length > 0 ? (
+          entries.map((entry) => (
+            <li key={entry.dateString} className="relative flex flex-col gap-3">
+              <Circle />
+              <strong className="mb-2 pt-[2.5px] text-xs font-semibold uppercase tracking-wide text-primary-400">
+                {format(parseISO(entry.dateString), "MMMM do, yyyy")}
+              </strong>
+              <Entries entries={entry.work} title="Work" />
+              <Entries
+                entries={entry.interestingThing}
+                title="Interesting thing"
+              />
+              <Entries entries={entry.learning} title="Learning" />
+            </li>
+          ))
+        ) : (
+          <p className="text-center">No entries yet</p>
         )}
-        <ol className="mx-2 flex flex-col gap-6 border-l-2 border-primary-400/15 pl-5">
-          {entries.length > 0 ? (
-            entries.map((entry) => (
-              <li
-                key={entry.dateString}
-                className="relative flex flex-col gap-3"
-              >
-                <Circle />
-                <strong className="mb-2 pt-[2.5px] text-xs font-semibold uppercase tracking-wide text-primary-400">
-                  {format(parseISO(entry.dateString), "MMMM do, yyyy")}
-                </strong>
-                <Entries entries={entry.work} title="Work" />
-                <Entries
-                  entries={entry.interestingThing}
-                  title="Interesting thing"
-                />
-                <Entries entries={entry.learning} title="Learning" />
-              </li>
-            ))
-          ) : (
-            <p className="text-center">No entries yet</p>
-          )}
-        </ol>
-      </section>
-    </>
+      </ol>
+    </RouteWrapper>
   );
 }
 

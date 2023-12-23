@@ -52,7 +52,7 @@ export function Label({
         `absolute 
       -top-3.5
       left-1
-      text-gray-950
+      text-gray-400
       transition-all
       peer-placeholder-shown:top-2
       peer-placeholder-shown:text-base
