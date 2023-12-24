@@ -17,10 +17,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 function EntriesPage() {
   return (
-    <main className="mx-auto flex min-h-[100dvh] max-w-3xl flex-col">
+    <>
       <TitleWithWrapper />
       <Outlet />
-    </main>
+    </>
   );
 }
 

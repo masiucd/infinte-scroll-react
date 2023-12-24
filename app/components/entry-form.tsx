@@ -29,41 +29,43 @@ export function EntryForm({ entry }: Props) {
         disabled={fetcher.state !== "idle"}
         className="flex flex-col gap-2 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        <div>
-          <input
-            type="date"
-            name="date"
-            defaultValue={format(
-              entry?.date ? parseISO(entry.date) : new Date(),
-              "yyyy-MM-dd",
-            )}
-            className="w-full rounded-md border-gray-700 bg-gray-800 text-gray-400 focus:border-primary-600 focus:ring-primary-600"
-            style={{ colorScheme: "dark" }}
-          />
-        </div>
-        <div className="flex gap-3  px-2 py-1">
-          {[
-            { label: "Work", value: "work" },
-            { label: "Learning", value: "learning" },
-            { label: "Interesting Thing", value: "interesting-thing" },
-          ].map(({ label, value }) => (
-            <label
-              htmlFor={value}
-              className="flex items-center gap-1 text-xs tracking-wide"
-              key={value}
-            >
-              <input
-                type="radio"
-                name="type"
-                id={value}
-                value={value}
-                defaultChecked={value === (entry?.type ?? "work")}
-                required
-                className="mr-2 border-gray-700 bg-gray-800 text-primary-600  focus:ring-primary-600 focus:ring-offset-gray-900"
-              />
-              <span>{label}</span>
-            </label>
-          ))}
+        <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
+          <div className="sm:order-2 sm:w-1/2">
+            <input
+              type="date"
+              name="date"
+              defaultValue={format(
+                entry?.date ? parseISO(entry.date) : new Date(),
+                "yyyy-MM-dd",
+              )}
+              className="w-full rounded-md border-gray-700 bg-gray-800 text-gray-400 focus:border-primary-600 focus:ring-primary-600"
+              style={{ colorScheme: "dark" }}
+            />
+          </div>
+          <div className="flex gap-3  px-2 py-1">
+            {[
+              { label: "Work", value: "work" },
+              { label: "Learning", value: "learning" },
+              { label: "Interesting Thing", value: "interesting-thing" },
+            ].map(({ label, value }) => (
+              <label
+                htmlFor={value}
+                className="flex items-center gap-1 text-xs tracking-wide"
+                key={value}
+              >
+                <input
+                  type="radio"
+                  name="type"
+                  id={value}
+                  value={value}
+                  defaultChecked={value === (entry?.type ?? "work")}
+                  required
+                  className="mr-2 border-gray-700 bg-gray-800 text-primary-600  focus:ring-primary-600 focus:ring-offset-gray-900"
+                />
+                <span>{label}</span>
+              </label>
+            ))}
+          </div>
         </div>
 
         <div>

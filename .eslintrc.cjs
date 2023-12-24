@@ -5,4 +5,7 @@ module.exports = {
     "@remix-run/eslint-config/node",
     "plugin:tailwindcss/recommended",
   ],
+  rules: {
+    "no-console": "warn",
+  },
 };

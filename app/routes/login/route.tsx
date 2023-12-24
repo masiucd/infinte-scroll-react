@@ -20,7 +20,6 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   let user = await findUserByEmail(email);
-  console.log("user", user);
   if (!user) {
     return {
       errors: {

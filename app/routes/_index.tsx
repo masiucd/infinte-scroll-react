@@ -12,7 +12,7 @@ export const meta: MetaFunction = () => [
 
 export default function Index() {
   return (
-    <main className="mx-auto flex min-h-[100dvh] max-w-3xl flex-col">
+    <>
       <TitleWithWrapper>
         <Link
           className="text-gray-400 underline hover:text-primary-400"
@@ -23,18 +23,21 @@ export default function Index() {
       </TitleWithWrapper>
       <section className="relative mx-auto flex w-full max-w-80 flex-1 flex-col sm:max-w-xl">
         <strong className="absolute right-2 text-4xl text-gray-300/45">
-          Learnings
+          <span className="text-primary-100/60">Learnings</span>
         </strong>
         <strong className="absolute right-2 top-[270px] rotate-3 text-5xl text-gray-200/25">
           Work Stuff
         </strong>
         <strong className="absolute right-20 top-20 rotate-6 text-4xl text-gray-400/30">
-          Intreating Things
+          <span className="text-primary-400/35">Intreating</span> Things
         </strong>
         <strong className="absolute left-0 top-44 -rotate-12 text-3xl text-gray-500/30">
-          Writing and Reading
+          Writing <span className="text-primary-400/55">and</span> Reading
+        </strong>
+        <strong className="absolute left-2 top-[320px] rotate-90 text-3xl text-gray-500/30">
+          Journal <span className="text-primary-200/40">Entries</span>
         </strong>
       </section>
-    </main>
+    </>
   );
 }

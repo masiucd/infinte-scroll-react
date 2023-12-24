@@ -13,7 +13,6 @@ import { getSession } from "~/session.server";
 import { update } from "./entry.server";
 import { validateAdmin } from "~/utils/validate-admin.server";
 import { EntryFormWrapper } from "~/components/entry-form-wrapper";
-import { RouteWrapper } from "~/components/route-wrapper";
 
 export const meta: MetaFunction = ({ params }: MetaArgs) => [
   { title: "My working journal - Edit entry" },
@@ -87,7 +86,7 @@ function handleSubmit(e: FormEvent<HTMLFormElement>) {
 export default function EditEntryPage() {
   let entry = useLoaderData<typeof loader>();
   return (
-    <RouteWrapper className="w-full">
+    <>
       <EntryFormWrapper>
         <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">
           Edit entry
@@ -106,6 +105,6 @@ export default function EditEntryPage() {
           </button>
         </Form>
       </div>
-    </RouteWrapper>
+    </>
   );
 }

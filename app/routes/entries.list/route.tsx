@@ -14,7 +14,6 @@ import { sleep } from "~/utils/sleep";
 import { validateAdmin } from "~/utils/validate-admin.server";
 import { getGroupedEntries } from "./entries.server";
 import { EntryFormWrapper } from "~/components/entry-form-wrapper";
-import { RouteWrapper } from "~/components/route-wrapper";
 
 export const meta: MetaFunction = () => [
   { title: "My working journal" },
@@ -81,7 +80,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export default function EntriesListPage() {
   let { entries, loggedIn } = useLoaderData<typeof loader>();
   return (
-    <RouteWrapper>
+    <>
       {loggedIn && (
         <EntryFormWrapper>
           <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">
@@ -110,7 +109,7 @@ export default function EntriesListPage() {
           <p className="text-center">No entries yet</p>
         )}
       </ol>
-    </RouteWrapper>
+    </>
   );
 }
 
