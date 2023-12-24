@@ -7,7 +7,6 @@ import { Form, Link, useActionData } from "@remix-run/react";
 import { commitSession, getSession } from "~/session.server";
 import { FormGroup, Input, Label } from "./form-parts";
 import { cn } from "~/utils/cn";
-import { findUserByEmail } from "~/database/queries/users.server";
 
 export async function action({ request }: ActionFunctionArgs) {
   let formData = await request.formData();
@@ -19,16 +18,7 @@ export async function action({ request }: ActionFunctionArgs) {
     });
   }
 
-  let user = await findUserByEmail(email);
-  if (!user) {
-    return {
-      errors: {
-        message: "Invalid email or password",
-      },
-    };
-  }
-  // TODO just for demo right now!!!!
-  if (user.email === email && user.password === password) {
+  if (email === process.env.EMAIL && password === process.env.PASSWORD) {
     let session = await getSession();
     session.set("admin", true);
     return redirect("/entries/list", {
