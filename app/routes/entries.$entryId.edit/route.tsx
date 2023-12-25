@@ -3,28 +3,29 @@ import type {
   ActionFunctionArgs,
   LoaderFunctionArgs,
   MetaArgs,
-  MetaFunction,
 } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
 import type { FormEvent } from "react";
 import { EntryForm } from "~/components/entry-form";
-import { deleteEntry, getEntryById } from "~/database/queries/entries.server";
+import { deleteEntry } from "~/database/queries/entries.server";
 import { getSession } from "~/session.server";
 import { update } from "./entry.server";
 import { validateAdmin } from "~/utils/validate-admin.server";
 import { EntryFormWrapper } from "~/components/entry-form-wrapper";
 import { getThemeCookie } from "~/utils/theme.server";
+import { getEntry } from "./entry";
 
-export const meta: MetaFunction = ({ params }: MetaArgs) => [
-  { title: "My working journal - Edit entry" },
-  {
-    name: "description",
-    content: `Edit entry - ${params.entryId}`,
-  },
-];
+export function meta({ params }: MetaArgs) {
+  return [
+    { title: "My working journal - Edit entry" },
+    {
+      name: "description",
+      content: `Edit entry - ${params.entryId}`,
+    },
+  ];
+}
 
 export async function action({ request, params }: ActionFunctionArgs) {
-  // Make sure the cookie and is authenticated to make any changes, preventing CSRF
   await validateAdmin(request);
   if (typeof params.entryId !== "string") {
     throw new Response("Not found", { status: 404, statusText: "Not found" });
@@ -67,18 +68,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       },
     });
   }
-  let id = parseInt(entryId, 10);
-  let entry = await getEntryById(id);
+  let entry = await getEntry(request, entryId);
   if (!entry) {
     throw new Response("Not found", {
       status: 404,
       statusText: "Not found",
     });
   }
-  let theme = await getThemeCookie(request);
   return {
     entry,
-    theme,
+    theme: await getThemeCookie(request),
   };
 }
 

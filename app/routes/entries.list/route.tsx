@@ -10,11 +10,10 @@ import { EntryForm } from "~/components/entry-form";
 import { insertEntry } from "~/database/queries/entries.server";
 import { insertSchema } from "~/database/schema/entries.server";
 import { getSession } from "~/session.server";
-import { sleep } from "~/utils/sleep";
 import { validateAdmin } from "~/utils/validate-admin.server";
-import { getGroupedEntries } from "./entries.server";
 import { EntryFormWrapper } from "~/components/entry-form-wrapper";
 import { getThemeCookie } from "~/utils/theme.server";
+import { getEntries } from "./entreis";
 
 export const meta: MetaFunction = () => [
   { title: "My working journal" },
@@ -37,45 +36,16 @@ export async function action({ request }: ActionFunctionArgs) {
   ) {
     throw new Error("Bad request");
   }
-  // TODO to test when connection is slow
-  await sleep();
   let newEntry = insertSchema.parse({ date: new Date(date), type, text });
   return await insertEntry(newEntry);
 }
 
-const EntryType = Object.freeze({
-  work: "work",
-  learning: "learning",
-  interestingThing: "interesting-thing",
-});
-
 export async function loader({ request }: LoaderFunctionArgs) {
   let session = await getSession(request.headers.get("Cookie"));
-  let groupedEntries = await getGroupedEntries();
   return {
     loggedIn: !!session.data.admin,
     theme: await getThemeCookie(request),
-    entries: Object.keys(groupedEntries).map((dateString) => ({
-      dateString,
-      work: groupedEntries[dateString]
-        .filter((entry) => entry.type === EntryType.work)
-        .map((entry) => ({
-          ...entry,
-          date: entry.date.toISOString(),
-        })),
-      learning: groupedEntries[dateString]
-        .filter((entry) => entry.type === EntryType.learning)
-        .map((entry) => ({
-          ...entry,
-          date: entry.date.toISOString(),
-        })),
-      interestingThing: groupedEntries[dateString]
-        .filter((entry) => entry.type === EntryType.interestingThing)
-        .map((entry) => ({
-          ...entry,
-          date: entry.date.toISOString(),
-        })),
-    })),
+    ...(await getEntries()),
   };
 }
 
