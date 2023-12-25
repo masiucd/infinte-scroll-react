@@ -14,6 +14,7 @@ import { sleep } from "~/utils/sleep";
 import { validateAdmin } from "~/utils/validate-admin.server";
 import { getGroupedEntries } from "./entries.server";
 import { EntryFormWrapper } from "~/components/entry-form-wrapper";
+import { getThemeCookie } from "~/utils/theme.server";
 
 export const meta: MetaFunction = () => [
   { title: "My working journal" },
@@ -53,6 +54,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   let groupedEntries = await getGroupedEntries();
   return {
     loggedIn: !!session.data.admin,
+    theme: await getThemeCookie(request),
     entries: Object.keys(groupedEntries).map((dateString) => ({
       dateString,
       work: groupedEntries[dateString]
@@ -78,15 +80,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function EntriesListPage() {
-  let { entries, loggedIn } = useLoaderData<typeof loader>();
+  let { entries, loggedIn, theme } = useLoaderData<typeof loader>();
   return (
     <>
       {loggedIn && (
         <EntryFormWrapper>
-          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-400">
             New entry
           </p>
-          <EntryForm />
+          <EntryForm theme={theme} />
         </EntryFormWrapper>
       )}
       <ol className="mx-2 flex flex-col gap-6 border-l-2 border-primary-400/15 pl-5">
@@ -115,7 +117,7 @@ export default function EntriesListPage() {
 
 function Circle() {
   return (
-    <div className="absolute left-[-27px] top-0 bg-gray-950 py-1 ">
+    <div className="absolute left-[-27px] top-0 bg-gray-100 py-1 dark:bg-gray-950 ">
       <div className="h-3 w-3 rounded-full border border-primary-400 bg-gray-900" />
     </div>
   );

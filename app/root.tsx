@@ -15,6 +15,7 @@ import {
   ScrollRestoration,
   isRouteErrorResponse,
   useLoaderData,
+  useLocation,
   useRouteError,
 } from "@remix-run/react";
 import styles from "./tailwind.css";
@@ -37,41 +38,42 @@ export const links: LinksFunction = () => [
   },
 ];
 
+async function redirectWithCookie(url: string, cookieValue: string) {
+  return redirect(url, {
+    headers: {
+      "Set-Cookie": await cookieValue,
+    },
+  });
+}
+
 export async function action({ request }: ActionFunctionArgs) {
   let formData = await request.formData();
   let action = formData.get("_action");
 
-  if (action === "logout") {
-    await validateAdmin(request);
-    let session = await getSession(request.headers.get("Cookie"));
-    return redirect("/entries/list", {
-      headers: {
-        "Set-Cookie": await destroySession(session),
-      },
-    });
-  }
+  switch (action) {
+    case "logout":
+      await validateAdmin(request);
+      let session = await getSession(request.headers.get("Cookie"));
+      return redirectWithCookie("/entries/list", await destroySession(session));
 
-  if (action === "theme") {
-    let cookieHeader = request.headers.get("Cookie");
-    let cookie = (await themeStorage.parse(cookieHeader)) || {};
-    if (!cookie.theme) {
-      cookie.theme = "dark";
-      return redirect(request.url, {
-        headers: {
-          "Set-Cookie": await themeStorage.serialize(cookie),
-        },
-      });
-    }
-    return redirect(request.url, {
-      headers: {
-        "Set-Cookie": await themeStorage.serialize({
+    case "theme":
+      let cookieHeader = request.headers.get("Cookie");
+      let cookie = (await themeStorage.parse(cookieHeader)) || {};
+      let path = String(formData.get("path"));
+      if (!cookie.theme) {
+        cookie.theme = "dark";
+        return redirectWithCookie(path, await themeStorage.serialize(cookie));
+      }
+      return redirectWithCookie(
+        path,
+        await themeStorage.serialize({
           theme: cookie.theme === "dark" ? "light" : "dark",
         }),
-      },
-    });
-  }
+      );
 
-  return null;
+    default:
+      return null;
+  }
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -168,6 +170,8 @@ function Footer() {
 
 function Header() {
   let { isAdmin, theme } = useLoaderData<typeof loader>();
+  let location = useLocation();
+  console.log("location", location);
   return (
     <header className="min-h-[5rem]">
       <div className="mx-auto flex max-w-4xl justify-between border-gray-500 px-2 pb-1 pt-5 md:px-0 lg:border-b">
@@ -199,6 +203,7 @@ function Header() {
             </Link>
           )}
           <Form method="post" className="flex ">
+            <input type="hidden" name="path" value={location.pathname} />
             <button
               value="theme"
               name="_action"

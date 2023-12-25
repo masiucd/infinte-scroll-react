@@ -13,6 +13,7 @@ import { getSession } from "~/session.server";
 import { update } from "./entry.server";
 import { validateAdmin } from "~/utils/validate-admin.server";
 import { EntryFormWrapper } from "~/components/entry-form-wrapper";
+import { getThemeCookie } from "~/utils/theme.server";
 
 export const meta: MetaFunction = ({ params }: MetaArgs) => [
   { title: "My working journal - Edit entry" },
@@ -74,7 +75,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       statusText: "Not found",
     });
   }
-  return entry;
+  let theme = await getThemeCookie(request);
+  return {
+    entry,
+    theme,
+  };
 }
 
 function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -84,14 +89,14 @@ function handleSubmit(e: FormEvent<HTMLFormElement>) {
 }
 
 export default function EditEntryPage() {
-  let entry = useLoaderData<typeof loader>();
+  let { entry, theme } = useLoaderData<typeof loader>();
   return (
     <>
       <EntryFormWrapper>
         <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">
           Edit entry
         </p>
-        <EntryForm entry={entry} />
+        <EntryForm entry={entry} theme={theme} />
       </EntryFormWrapper>
       <div className="px-2 sm:px-0">
         <Form method="post" onSubmit={handleSubmit}>

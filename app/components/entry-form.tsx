@@ -10,9 +10,10 @@ type Entry = {
 };
 type Props = {
   entry?: Entry;
+  theme: "light" | "dark";
 };
 
-export function EntryForm({ entry }: Props) {
+export function EntryForm({ entry, theme }: Props) {
   let fetcher = useFetcher({ key: "entry-form" });
   let ref = useRef<HTMLTextAreaElement | null>(null);
 
@@ -38,8 +39,8 @@ export function EntryForm({ entry }: Props) {
                 entry?.date ? parseISO(entry.date) : new Date(),
                 "yyyy-MM-dd",
               )}
-              className="w-full rounded-md border-gray-700 bg-gray-800 text-gray-400 focus:border-primary-600 focus:ring-primary-600"
-              style={{ colorScheme: "dark" }}
+              className="w-full rounded-md border-gray-400 text-gray-500 focus:border-primary-600 focus:ring-primary-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400"
+              style={{ colorScheme: theme }}
             />
           </div>
           <div className="flex gap-3  px-2 py-1">
@@ -75,7 +76,7 @@ export function EntryForm({ entry }: Props) {
             required
             ref={ref}
             defaultValue={entry?.text}
-            className="min-h-32 w-full rounded-md border-gray-700 bg-gray-800 text-white focus:border-primary-600 focus:ring-primary-600"
+            className="min-h-32 w-full rounded-md focus:border-primary-600 focus:ring-primary-600 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
           />
         </div>
 
