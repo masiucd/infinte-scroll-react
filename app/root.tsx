@@ -36,32 +36,55 @@ export const links: LinksFunction = () => [
 ];
 
 export async function action({ request }: ActionFunctionArgs) {
-  await validateAdmin(request);
   let formData = await request.formData();
   let action = formData.get("_action");
-  let session = await getSession(request.headers.get("Cookie"));
+
   if (action === "logout") {
+    await validateAdmin(request);
+    let session = await getSession(request.headers.get("Cookie"));
     return redirect("/entries/list", {
       headers: {
         "Set-Cookie": await destroySession(session),
       },
     });
   }
+
+  if (action === "theme") {
+    let cookieHeader = request.headers.get("Cookie");
+    let cookie = (await themeStorage.parse(cookieHeader)) || {};
+    if (!cookie.theme) {
+      cookie.theme = "dark";
+      return redirect(request.url, {
+        headers: {
+          "Set-Cookie": await themeStorage.serialize(cookie),
+        },
+      });
+    }
+    return redirect(request.url, {
+      headers: {
+        "Set-Cookie": await themeStorage.serialize({
+          theme: cookie.theme === "dark" ? "light" : "dark",
+        }),
+      },
+    });
+  }
+
   return null;
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
   let session = await getSession(request.headers.get("Cookie"));
-  let themeCookie = await themeStorage.parse(request.headers.get("Cookie"));
+  let themeCookie =
+    (await themeStorage.parse(request.headers.get("Cookie"))) || {};
   return {
     isAdmin: !!session.data.admin,
-    theme: themeCookie?.theme || "dark",
+    // theme: themeCookie.theme ?? "dark",
+    theme: (themeCookie.theme ?? "dark") as "dark" | "light",
   };
 }
 
 export default function App() {
   let { theme } = useLoaderData<typeof loader>();
-  console.log("theme", theme);
   return (
     <html
       lang="en"
@@ -143,7 +166,7 @@ function Footer() {
 }
 
 function Header() {
-  let { isAdmin } = useLoaderData<typeof loader>();
+  let { isAdmin, theme } = useLoaderData<typeof loader>();
   return (
     <header className="min-h-[5rem]">
       <div className="mx-auto flex max-w-4xl justify-between border-gray-500 px-2 pb-1 pt-5 md:px-0 lg:border-b">
@@ -156,7 +179,7 @@ function Header() {
             <span className="text-gray-500">Druzynski</span>
           </strong>
         </Link>
-        <div className="flex justify-end  text-gray-500">
+        <div className="flex items-center justify-end gap-2 text-gray-500">
           {isAdmin ? (
             <Form method="post">
               <button
@@ -165,18 +188,29 @@ function Header() {
                 type="submit"
                 className="hover:opacity-50"
               >
-                <span className="flex items-center gap-2 text-sm ">
-                  <span>Logout</span>
-                </span>
+                <span className="flex items-center gap-2 text-sm ">Logout</span>
               </button>
             </Form>
           ) : (
             <Link to="/login" className="flex hover:opacity-50">
-              <span className="flex items-center gap-2 text-sm">
-                <span>Log in</span>
-              </span>
+              <span className="flex items-center gap-2 text-sm">Log in</span>
             </Link>
           )}
+          <Form method="post">
+            <button
+              value="theme"
+              name="_action"
+              type="submit"
+              className="hover:opacity-50"
+            >
+              <span
+                className="flex items-center gap-2 text-sm"
+                title="Toggle theme"
+              >
+                {theme === "dark" ? <span>🌞</span> : <span>🌛</span>}
+              </span>
+            </button>
+          </Form>
         </div>
       </div>
     </header>
