@@ -23,6 +23,8 @@ import { validateAdmin } from "./utils/validate-admin.server";
 
 import { cn } from "./utils/cn";
 import { themeStorage } from "./utils/theme.server";
+import { Sun } from "./components/sun";
+import { Moon } from "./components/moon";
 
 export const links: LinksFunction = () => [
   {
@@ -78,8 +80,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     (await themeStorage.parse(request.headers.get("Cookie"))) || {};
   return {
     isAdmin: !!session.data.admin,
-    // theme: themeCookie.theme ?? "dark",
-    theme: (themeCookie.theme ?? "dark") as "dark" | "light",
+    theme: (themeCookie.theme ?? "light") as "dark" | "light",
   };
 }
 
@@ -174,12 +175,13 @@ function Header() {
           to="/"
           className="transition-opacity duration-75 hover:opacity-60"
         >
-          <strong className="text-sm uppercase tracking-tight text-gray-200">
-            Marcell<span className="text-gray-400">Ciszek</span>
-            <span className="text-gray-500">Druzynski</span>
+          <strong className="text-sm uppercase tracking-tight text-gray-700 dark:text-gray-200">
+            Marcell
+            <span className="text-gray-600 dark:text-gray-400">Ciszek</span>
+            <span className="text-gray-500 dark:text-gray-500">Druzynski</span>
           </strong>
         </Link>
-        <div className="flex items-center justify-end gap-2 text-gray-500">
+        <div className="flex items-center justify-end gap-2  text-gray-500">
           {isAdmin ? (
             <Form method="post">
               <button
@@ -192,11 +194,11 @@ function Header() {
               </button>
             </Form>
           ) : (
-            <Link to="/login" className="flex hover:opacity-50">
+            <Link to="/login" className="hover:opacity-50">
               <span className="flex items-center gap-2 text-sm">Log in</span>
             </Link>
           )}
-          <Form method="post">
+          <Form method="post" className="flex ">
             <button
               value="theme"
               name="_action"
@@ -207,7 +209,7 @@ function Header() {
                 className="flex items-center gap-2 text-sm"
                 title="Toggle theme"
               >
-                {theme === "dark" ? <span>🌞</span> : <span>🌛</span>}
+                {theme === "dark" ? <Sun /> : <Moon />}
               </span>
             </button>
           </Form>
