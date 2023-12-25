@@ -82,54 +82,48 @@ function Footer() {
   return (
     <footer className="flex h-20 items-center ">
       <div className="mx-auto flex w-full max-w-4xl items-center justify-between border-gray-500 px-2 pb-1 pt-5 md:px-0 lg:border-t">
-        <div className="flex gap-3">
-          <ul className="flex justify-end  gap-3 text-gray-500">
-            <li>
-              <Link to="/entries/list" className="flex hover:opacity-50">
-                <span className="flex items-center gap-2 text-sm">
-                  <span>Entries</span>
-                </span>
-              </Link>
-            </li>
-          </ul>
-          <small>
-            <span className="text-sm text-gray-500">
+        <ul className="flex items-center justify-end gap-3 text-gray-500">
+          <li>
+            <Link to="/entries/list" className="flex hover:opacity-50">
+              <span className="flex items-center gap-2 text-sm">
+                <span>Entries</span>
+              </span>
+            </Link>
+          </li>
+          <li>
+            <small className="text-sm text-gray-500">
               &copy; {new Date().getFullYear()}{" "}
               <span className="hidden md:inline-block">
                 Marcell Ciszek Druzynski
               </span>
               <span className=" md:hidden">M.C.D</span>
-            </span>
-          </small>
-        </div>
+            </small>
+          </li>
+        </ul>
         <ul className="flex gap-3">
-          <li className="flex items-center gap-2 text-sm text-gray-500">
-            <a
-              href="https://github.com/masiucd"
-              target="_blank"
-              rel="noopener noreferrer"
+          {[
+            {
+              name: "Github",
+              url: "https://github.com/masiucd",
+            },
+            {
+              name: "Twitter",
+              url: "https://twitter.com/masiu_cd",
+            },
+            {
+              name: "Instagram",
+              url: "https://www.instagram.com/masiu_cd/",
+            },
+          ].map((link) => (
+            <li
+              className="flex items-center gap-2 text-sm text-gray-500"
+              key={link.url}
             >
-              Github
-            </a>
-          </li>
-          <li className="flex items-center gap-2 text-sm text-gray-500">
-            <a
-              href="https://twitter.com/masiu_cd"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              X
-            </a>
-          </li>
-          <li className="flex items-center gap-2 text-sm text-gray-500">
-            <a
-              href="https://www.instagram.com/masiu_cd/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Instagram
-            </a>
-          </li>
+              <a href={link.url} target="_blank" rel="noopener noreferrer">
+                {link.name}
+              </a>
+            </li>
+          ))}
         </ul>
       </div>
     </footer>
