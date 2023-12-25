@@ -66,74 +66,73 @@ export default function App() {
       </head>
       <body className="bg-gray-950 text-gray-50">
         <Header />
-        <main className="mx-auto mb-10 flex min-h-[calc(100dvh-190px)] w-full flex-col px-2 sm:max-w-2xl sm:px-0">
+        <main className="mx-auto mb-10 flex min-h-[calc(100dvh-200px)] w-full flex-col px-2 sm:max-w-2xl sm:px-0">
           <Outlet />
         </main>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
-
-        <footer className="flex h-20 items-center ">
-          <div className="mx-auto flex w-full max-w-4xl items-center justify-between border-gray-500 px-2 pb-1 pt-5 md:px-0 lg:border-t">
-            <div className="flex gap-3">
-              <ul className="flex justify-end  gap-3 text-gray-500">
-                <li>
-                  <Link
-                    to="/about"
-                    className="pointer-events-none flex hover:opacity-50"
-                  >
-                    <span className="flex items-center gap-2 text-sm">
-                      <span>About</span>
-                    </span>
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/entries/list" className="flex hover:opacity-50">
-                    <span className="flex items-center gap-2 text-sm">
-                      <span>Entries</span>
-                    </span>
-                  </Link>
-                </li>
-              </ul>
-              <small>
-                <span className="text-sm text-gray-500">
-                  &copy; {new Date().getFullYear()} Marcell Ciszek Druzynski
-                </span>
-              </small>
-            </div>
-            <ul className="flex gap-3">
-              <li className="flex items-center gap-2 text-sm text-gray-500">
-                <a
-                  href="https://github.com/masiucd"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Github
-                </a>
-              </li>
-              <li className="flex items-center gap-2 text-sm text-gray-500">
-                <a
-                  href="https://twitter.com/masiu_cd"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  X
-                </a>
-              </li>
-              <li className="flex items-center gap-2 text-sm text-gray-500">
-                <a
-                  href="https://www.instagram.com/masiu_cd/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Instagram
-                </a>
-              </li>
-            </ul>
-          </div>
-        </footer>
+        <Footer />
       </body>
     </html>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="flex h-20 items-center ">
+      <div className="mx-auto flex w-full max-w-4xl items-center justify-between border-gray-500 px-2 pb-1 pt-5 md:px-0 lg:border-t">
+        <div className="flex gap-3">
+          <ul className="flex justify-end  gap-3 text-gray-500">
+            <li>
+              <Link to="/entries/list" className="flex hover:opacity-50">
+                <span className="flex items-center gap-2 text-sm">
+                  <span>Entries</span>
+                </span>
+              </Link>
+            </li>
+          </ul>
+          <small>
+            <span className="text-sm text-gray-500">
+              &copy; {new Date().getFullYear()}{" "}
+              <span className="hidden md:inline-block">
+                Marcell Ciszek Druzynski
+              </span>
+              <span className=" md:hidden">M.C.D</span>
+            </span>
+          </small>
+        </div>
+        <ul className="flex gap-3">
+          <li className="flex items-center gap-2 text-sm text-gray-500">
+            <a
+              href="https://github.com/masiucd"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Github
+            </a>
+          </li>
+          <li className="flex items-center gap-2 text-sm text-gray-500">
+            <a
+              href="https://twitter.com/masiu_cd"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              X
+            </a>
+          </li>
+          <li className="flex items-center gap-2 text-sm text-gray-500">
+            <a
+              href="https://www.instagram.com/masiu_cd/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Instagram
+            </a>
+          </li>
+        </ul>
+      </div>
+    </footer>
   );
 }
 
