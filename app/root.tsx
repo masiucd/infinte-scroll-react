@@ -21,6 +21,9 @@ import styles from "./tailwind.css";
 import { destroySession, getSession } from "./session.server";
 import { validateAdmin } from "./utils/validate-admin.server";
 
+import { cn } from "./utils/cn";
+import { themeStorage } from "./utils/theme.server";
+
 export const links: LinksFunction = () => [
   {
     rel: "stylesheet",
@@ -49,22 +52,31 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export async function loader({ request }: LoaderFunctionArgs) {
   let session = await getSession(request.headers.get("Cookie"));
-
+  let themeCookie = await themeStorage.parse(request.headers.get("Cookie"));
   return {
     isAdmin: !!session.data.admin,
+    theme: themeCookie?.theme || "dark",
   };
 }
 
 export default function App() {
+  let { theme } = useLoaderData<typeof loader>();
+  console.log("theme", theme);
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      style={{
+        colorScheme: theme,
+      }}
+      className={cn(theme)}
+    >
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
       </head>
-      <body className="bg-gray-950 text-gray-50">
+      <body className="bg-gray-100 text-gray-900 dark:bg-gray-950 dark:text-gray-50">
         <Header />
         <main className="mx-auto mb-10 flex min-h-[calc(100dvh-200px)] w-full flex-col px-2 sm:max-w-2xl sm:px-0">
           <Outlet />
